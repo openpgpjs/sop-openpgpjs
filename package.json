@@ -1,0 +1,16 @@
+{
+  "name": "sop.js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openpgp": "^4.6.2",
+    "yargs": "^14.2.0"
+  }
+}
