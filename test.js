@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var openpgp = require('openpgp');
 var yargs = require('yargs');
-
+var fs = require('fs');
 
 const encrypt = async (cert) => {
 
@@ -13,7 +13,8 @@ const encrypt = async (cert) => {
 
   options = {
     message: openpgp.message.fromBinary(new Uint8Array([0x01, 0x01, 0x01])), // input as Message object
-    passwords: ['secret stuff'],                                             // multiple passwords possible
+    // passwords: ['secret stuff'],                                             // multiple passwords possible
+    publicKeys: cert,
     armor: true
   };
 
@@ -25,14 +26,13 @@ const encrypt = async (cert) => {
 
 
 yargs
-  .command('encrypt', 'Encrypt...', (yargs) => {
-    yargs
-      .positional('cert', {
-        describe: 'Cert to use for encryption'
-      })
-  }, (argv) => {
+  .command('encrypt [cert]', 'Encrypt...', (yargs) => {}, async (argv) => {
     console.log(argv);
-    encrypt(argv._[1]);
+
+    const buf = fs.readFileSync(argv.cert);
+    const readKey = await openpgp.key.read(buf).catch(e => openpgp.key.readArmored(buf));
+    console.log({readKey});
+    encrypt(readKey.keys[0]);
   })
   .help()
   .alias('help', 'h')
