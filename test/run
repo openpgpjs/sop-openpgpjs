@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+echo 'Test encrypting and decrypting with armored key... success.' |
+./sop-openpgp encrypt test/testkey.asc |
+./sop-openpgp decrypt test/testkey.sec.asc
+
+echo 'Test encrypting and decrypting with binary key... success.' |
+./sop-openpgp encrypt test/testkey.pgp |
+./sop-openpgp decrypt test/testkey.sec.pgp
