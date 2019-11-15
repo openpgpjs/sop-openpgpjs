@@ -2,10 +2,16 @@
 const yargs = require('yargs');
 
 const encrypt = require('./encrypt');
+const decrypt = require('./decrypt');
 
 yargs
-  .command('encrypt [certfile]', 'Encrypt...', (yargs) => {}, async (argv) => {
-    encrypt(argv.certfile);
+  .command({
+    command: 'encrypt [certfile]',
+    handler: async (argv) => { encrypt(argv.certfile); }
+  })
+  .command({
+    command: 'decrypt [certfile]',
+    handler: async (argv) => { decrypt(argv.certfile); }
   })
   .help()
   .alias('help', 'h')
