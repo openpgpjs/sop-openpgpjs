@@ -1,8 +1,11 @@
 const openpgp = require('openpgp');
 const fs = require('fs');
 
-const encrypt = async (cert) => {
+const encrypt = async (certfile) => {
 
+  const buf = fs.readFileSync(certfile);
+  const readKey = await openpgp.key.read(buf).catch(e => openpgp.key.readArmored(buf));
+  const cert = readKey.keys[0];
   const data = fs.readFileSync(0, 'utf-8');
 
   // set the relative web worker path

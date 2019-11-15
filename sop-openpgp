@@ -1,15 +1,11 @@
 #!/usr/bin/env node
-const openpgp = require('openpgp');
 const yargs = require('yargs');
-const fs = require('fs');
 
 const encrypt = require('./encrypt');
 
 yargs
-  .command('encrypt [cert]', 'Encrypt...', (yargs) => {}, async (argv) => {
-    const buf = fs.readFileSync(argv.cert);
-    const readKey = await openpgp.key.read(buf).catch(e => openpgp.key.readArmored(buf));
-    encrypt(readKey.keys[0]);
+  .command('encrypt [certfile]', 'Encrypt...', (yargs) => {}, async (argv) => {
+    encrypt(argv.certfile);
   })
   .help()
   .alias('help', 'h')
