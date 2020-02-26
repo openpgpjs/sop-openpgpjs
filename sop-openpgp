@@ -3,18 +3,83 @@ const yargs = require('yargs');
 
 const encrypt = require('./encrypt');
 const decrypt = require('./decrypt');
+const sign = require('./sign');
+const verify = require('./verify');
+const generate = require('./generate');
+const extract = require('./extract');
+const openpgp = require('openpgp');
 
 yargs
   .command({
     command: 'encrypt [certfile]',
-    handler: async (argv) => { encrypt(argv.certfile); }
+    handler: async (argv) => {
+      encrypt(argv.withPassword, argv.signWith, argv.certfile);
+    }
+  })
+  .option('with-password', {
+    describe: 'symmetric encryption',
+    type: 'string'
+  })
+  .option('sign-with', {
+    describe: 'sign with key',
+  })
+  .option('as', {
+    describe: 'binary or text'
   })
   .command({
     command: 'decrypt [certfile]',
-    handler: async (argv) => { decrypt(argv.certfile); }
+    handler: async (argv) => {
+      decrypt(argv.withPassword, argv.sessionKeyOut , argv.withSessionKey, argv.verifyWith, argv.verifyOut, argv.certfile);
+    }
+  })
+  .option('session-key-out', {
+    describe: 'session key of encrypted message',
+  })
+  .option('with-session-key', {
+    describe: 'decrypt using provided session key',
+  })
+  .option('with-password', {
+    describe: 'symmetric encryption',
+    type: 'string'
+  })
+  .option('verify-with', {
+    describe: 'verify with key',
+  })
+  .option('verify-out', {
+    describe: 'save verifications to file',
+  })
+  .command({
+    command: 'sign <certfile>',
+    handler: async (argv) => { sign(argv.certfile); }
+  })
+  .command({
+    command: 'verify <signature> <certfile>',
+    handler: async (argv) => { verify(argv.signature, argv.certfile); }
+  })
+  .command({
+    command: 'extract-cert <certfile>',
+    handler: async (argv) => { let armor = true;
+      if (argv.armor == false) {
+        armor = false;
+      };
+      extract(armor, argv.certfile); }
+  })
+  .boolean('armor')
+  .command({
+    command: 'generate-key',
+    handler: async (argv) => {
+      const userid = argv._.slice(1);
+      let armor = true;
+      if (argv.armor == false) {
+        armor = false;
+      };
+      generate(armor, userid); }
+  })
+  .boolean('armor')
+  .command({
+    command: 'version',
+    handler: () => { console.log( openpgp.config.versionstring ) }
   })
   .help()
   .alias('help', 'h')
   .argv;
-
-
