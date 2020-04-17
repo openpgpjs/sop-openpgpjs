@@ -23,6 +23,10 @@ const encrypt = async (withPassword, signWith, certfile) => {
     readKey = await openpgp.key.readArmored(buf);
   }
   const cert = readKey.keys[0];
+  const aeadSupported = await openpgp.key.isAeadSupported([cert]);
+  if (aeadSupported) {
+    openpgp.config.aead_protect = true;
+  }
   let options = {
     message: openpgp.message.fromText(data),
     publicKeys: cert,
