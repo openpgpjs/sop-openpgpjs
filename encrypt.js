@@ -12,7 +12,7 @@ const encrypt = async (withPassword, signWith, certfile) => {
       passwords: withPassword
     }
     openpgp.encrypt(options).then( (ciphertext) => {
-      console.log(ciphertext.data);
+      process.stdout.write(ciphertext.data);
     });
     return;
   }
@@ -44,7 +44,7 @@ const encrypt = async (withPassword, signWith, certfile) => {
 
   openpgp.encrypt(options).then( (ciphertext) => {
 //    encrypted = ciphertext.message.packets.write(); // get raw encrypted packets as Uint8Array
-    console.log(ciphertext.data);
+    process.stdout.write(ciphertext.data);
   }).catch((e) => {
     console.error(e);
     return process.exit(CERT_CANNOT_ENCRYPT);

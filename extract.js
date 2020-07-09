@@ -1,6 +1,6 @@
 const openpgp = require('openpgp');
 const fs = require('fs');
-
+const process = require('process');
 
 const extract = async (armor, certfile) => {
     const buf = fs.readFileSync(certfile);
@@ -14,7 +14,7 @@ const extract = async (armor, certfile) => {
         fs.writeSync(1, pubKey.toPacketlist().write());
         return;
     }
-    console.log(pubKey.armor());
+    process.stdout.write(pubKey.armor());
 }
 
 

@@ -23,7 +23,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       passwords: withPassword
     }
     openpgp.decrypt(options).then( (clearText) => {
-      console.log(clearText.data);
+      process.stdout.write(clearText.data);
     }).catch((e) => {
       console.error(e);
       return process.exit(CANNOT_DECRYPT);
@@ -42,7 +42,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       sessionKeys: sessionKey
     }
     openpgp.decrypt(options).then(async (clearText) => {
-      console.log(clearText.data);
+      process.stdout.write(clearText.data);
     }).catch((e) => {
       console.error(e);
       return process.exit(CANNOT_DECRYPT);
@@ -72,7 +72,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   openpgp.decrypt(options).then( async (clearText) => {
-    console.log(clearText.data);
+    process.stdout.write(clearText.data);
     if (verifyOut && clearText.signatures[0].valid) {
       const today = Date.now();
       const signKey = await  verifyKey.keys[0].getSigningKey();

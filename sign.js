@@ -20,7 +20,7 @@ const sign = async (certfile) => {
   };
 
   openpgp.sign(options).then( async (signed) => {
-    console.log(signed.signature);
+    process.stdout.write(signed.signature);
   });
 };
 
