@@ -71,10 +71,19 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   openpgp.decrypt(options).then( async (clearText) => {
     process.stdout.write(clearText.data);
-    if (verifyOut && clearText.signatures[0].valid) {
-      const today = Date.now();
-      const signKey = await  verifyKey.keys[0].getSigningKey();
-      fs.writeFileSync(verifyOut, today + ' ' + signKey.getFingerprint() + ' ' + verifyKey.keys[0].primaryKey.getFingerprint());
+    if (verifyOut) {
+      let count = 0;
+      for (s of sig.signatures) {
+        if (s.valid) {
+        count += 1;
+        const timestamp = s.signature.packets[0].created.toISOString();
+        const signKey = await verifyKey.getSigningKey(s.signature.issuerKeyId, null);
+          fs.writeFileSync(verifyOut,
+                           timestamp
+                           + ' ' + signKey.getFingerprint()
+                           + ' ' + verifyKey.keys[0].primaryKey.getFingerprint());
+        }
+      }
     }
   }).catch((e) => {
     console.error(e);

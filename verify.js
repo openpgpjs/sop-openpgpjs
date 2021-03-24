@@ -33,11 +33,19 @@ const verify = async (signature, certfile) => {
   };
 
   openpgp.verify(options).then(async (sig) => {
-    if (sig.signatures[0].valid) {
-      const today = sig.signatures[0].signature.packets[0].created.toISOString();
-      const signKey = await cert.getSigningKey(sig.signatures[0].signature.issuerKeyId, null);
-      console.log(today + ' ' + signKey.getFingerprint() + ' ' + cert.primaryKey.getFingerprint());
-    } else {
+    let count = 0;
+    for (s of sig.signatures) {
+      if (s.valid) {
+        count += 1;
+        const timestamp = s.signature.packets[0].created.toISOString();
+        const signKey = await cert.getSigningKey(s.signature.issuerKeyId, null);
+        console.log(timestamp
+                    + ' ' + signKey.getFingerprint()
+                    + ' ' + cert.primaryKey.getFingerprint());
+      }
+    }
+
+    if (count == 0) {
       return process.exit(NO_SIGNATURE);
     }
   }).catch((e) => {
