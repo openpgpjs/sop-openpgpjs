@@ -24,7 +24,7 @@ const verify = async (signature, certfile) => {
     }
   }
 
-  const data = fs.readFileSync(0, 'utf-8');
+  const data = utils.read_stdin();
 
   let options = {
     message: openpgp.message.fromText(data),

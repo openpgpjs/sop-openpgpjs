@@ -6,7 +6,7 @@ const utils = require('./utils');
 const CERT_CANNOT_ENCRYPT = 17;
 
 const encrypt = async (withPassword, signWith, certfile) => {
-  const data = fs.readFileSync(0, 'utf-8');
+  const data = utils.read_stdin();
   if (withPassword) {
     let options = {
       message: openpgp.message.fromText(data),

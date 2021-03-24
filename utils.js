@@ -36,5 +36,13 @@ const load_keys = async (filename) => {
     return keys;
 }
 
+const read_stdin = () => {
+    // Using the file descriptor 0 is unreliable, because EAGAIN is
+    // not handled.  Using '/dev/stdin' works better, but will not
+    // work on non-posixly systems.
+    return fs.readFileSync('/dev/stdin');
+}
+
 module.exports.load_certs = load_certs;
 module.exports.load_keys = load_keys;
+module.exports.read_stdin = read_stdin;

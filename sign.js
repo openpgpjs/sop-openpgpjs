@@ -6,7 +6,7 @@ const sign = async (certfile) => {
 
   let readKey = await utils.load_keys(certfile);
   const cert = readKey.keys[0];
-  const data = fs.readFileSync(0, 'utf-8');
+  const data = utils.read_stdin();
 
   let options = {
     message: openpgp.message.fromText(data),

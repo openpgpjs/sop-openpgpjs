@@ -6,7 +6,7 @@ const utils = require('./utils');
 const CANNOT_DECRYPT = 29;
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verifyOut, certfile) => {
-  const encrypted = fs.readFileSync(0);
+  const encrypted = utils.read_stdin();
   let message;
   try {
     message = await openpgp.message.read(encrypted);
