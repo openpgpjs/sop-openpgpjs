@@ -1,13 +1,10 @@
 const openpgp = require('openpgp');
 const fs = require('fs');
 const process = require('process');
+const utils = require('./utils');
 
 const extract = async (armor, certfile) => {
-    const buf = fs.readFileSync(certfile);
-    let readKey = await openpgp.key.read(buf);
-    if (!readKey.keys[0]) {
-      readKey = await openpgp.key.readArmored(buf);
-    }
+    let readKey = await utils.load_keys(certfile);
     const cert = readKey.keys[0];
     const pubKey = cert.toPublic();
     if (!armor) {

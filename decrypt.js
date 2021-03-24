@@ -1,6 +1,7 @@
 const openpgp = require('openpgp');
 const fs = require('fs');
 const process = require('process');
+const utils = require('./utils');
 
 const CANNOT_DECRYPT = 29;
 
@@ -10,7 +11,12 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   try {
     message = await openpgp.message.read(encrypted);
   } catch (e) {
-    message = await openpgp.message.readArmored(encrypted);
+    try {
+      message = await openpgp.message.readArmored(encrypted);
+    } catch (e) {
+      console.error(e);
+      return process.exit(BAD_DATA);
+    }
   }
 
   if (!withPassword && !withSessionKey && !certfile) {
@@ -49,12 +55,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     });
     return;
   }
-  const buf = fs.readFileSync(certfile);
-  let readKey;
-  readKey = await openpgp.key.read(buf);
-  if (!readKey.keys[0]) {
-    readKey = await openpgp.key.readArmored(buf);
-  }
+
+  let readKey = await utils.load_keys(certfile);
   const cert = readKey.keys[0];
   let options = {
     message: message,
@@ -63,11 +65,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   let verifyKey;
   if (verifyWith) {
-    const verifyBuf = fs.readFileSync(verifyWith);
-    verifyKey = await openpgp.key.read(verifyBuf);
-    if (!verifyKey.keys[0]) {
-      verifyKey =  await openpgp.key.readArmored(verifyBuf);
-    }
+    verifyKey = await utils.load_certs(verifyWith);
     options.publicKeys = verifyKey.keys[0];
   }
 

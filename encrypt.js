@@ -1,6 +1,7 @@
 const openpgp = require('openpgp');
 const fs = require('fs');
 const process = require('process');
+const utils = require('./utils');
 
 const CERT_CANNOT_ENCRYPT = 17;
 
@@ -16,12 +17,8 @@ const encrypt = async (withPassword, signWith, certfile) => {
     });
     return;
   }
-  const buf = fs.readFileSync(certfile);
-  let readKey;
-  readKey = await openpgp.key.read(buf);
-  if (!readKey.keys[0]) {
-    readKey = await openpgp.key.readArmored(buf);
-  }
+
+  let readKey = await utils.load_certs(certfile);
   const cert = readKey.keys[0];
   const aeadSupported = await openpgp.key.isAeadSupported([cert]);
   if (aeadSupported) {
@@ -33,12 +30,7 @@ const encrypt = async (withPassword, signWith, certfile) => {
     armor: true
   };
   if (signWith) {
-    const signBuf = fs.readFileSync(signWith);
-    let signKey;
-    signKey = await openpgp.key.read(signBuf);
-    if (!signKey.keys[0]) {
-      signKey =  await openpgp.key.readArmored(signBuf);
-    }
+    let signKey = utils.load_keys(signWith);
     options.privateKeys = signKey.keys[0];
   }
 
