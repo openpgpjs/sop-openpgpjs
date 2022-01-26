@@ -73,15 +73,20 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     process.stdout.write(clearText.data);
     if (verifyOut) {
       let count = 0;
-      for (s of sig.signatures) {
-        if (s.valid) {
-        count += 1;
-        const timestamp = s.signature.packets[0].created.toISOString();
-        const signKey = await verifyKey.getSigningKey(s.signature.issuerKeyId, null);
-          fs.writeFileSync(verifyOut,
-                           timestamp
-                           + ' ' + signKey.getFingerprint()
-                           + ' ' + verifyKey.keys[0].primaryKey.getFingerprint());
+      for (s of clearText.signatures) {
+        if (await s.verified) {
+          count += 1;
+          const timestamp = utils.format_date(s.signature.packets[0].created);
+          for (key of verifyKey.keys) {
+            const signKey = await key.getSigningKey(s.signature.issuerKeyId, null);
+            if (signKey) {
+              fs.writeFileSync(verifyOut,
+                               timestamp
+                               + ' ' + signKey.getFingerprint()
+                               + ' ' + key.primaryKey.getFingerprint());
+              break;
+            }
+          }
         }
       }
     }

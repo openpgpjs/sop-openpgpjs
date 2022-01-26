@@ -43,6 +43,14 @@ const read_stdin = () => {
     return fs.readFileSync('/dev/stdin');
 }
 
+// Emits a Date as specified in Section 5.9 of the SOP spec.
+const format_date = (d) => {
+    // E.g.: 2019-10-24T23:48:29Z
+    return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}T`
+	+ `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}Z`;
+}
+
 module.exports.load_certs = load_certs;
 module.exports.load_keys = load_keys;
 module.exports.read_stdin = read_stdin;
+module.exports.format_date = format_date;

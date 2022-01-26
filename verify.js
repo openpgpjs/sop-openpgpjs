@@ -35,9 +35,9 @@ const verify = async (signature, certfile) => {
   openpgp.verify(options).then(async (sig) => {
     let count = 0;
     for (s of sig.signatures) {
-      if (s.valid) {
+      if (await s.verified) {
         count += 1;
-        const timestamp = s.signature.packets[0].created.toISOString();
+        const timestamp = utils.format_date(s.signature.packets[0].created);
         const signKey = await cert.getSigningKey(s.signature.issuerKeyId, null);
         console.log(timestamp
                     + ' ' + signKey.getFingerprint()
