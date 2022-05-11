@@ -24,9 +24,10 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   if (withPassword) {
+    let password = fs.readFileSync(withPassword);
     let options = {
       message: message,
-      passwords: withPassword
+      passwords: password
     }
     openpgp.decrypt(options).then( (clearText) => {
       process.stdout.write(clearText.data);

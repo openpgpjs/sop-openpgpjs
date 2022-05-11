@@ -8,8 +8,8 @@ echo 'Test encrypting and decrypting with binary key... success.' |
 ./sop-openpgp decrypt test/testkey.sec.pgp
 
 echo 'Test encrypting and decrypting with password' |
-./sop-openpgp encrypt --with-password=123 |
-./sop-openpgp decrypt --with-password=123
+./sop-openpgp encrypt --with-password=test/password.txt |
+./sop-openpgp decrypt --with-password=test/password.txt
 
 echo 'Test signing' |
 ./sop-openpgp sign test/alice.sec
