@@ -78,7 +78,7 @@ yargs
   .boolean('armor')
   .command({
     command: 'version',
-    handler: () => { console.log( openpgp.config.versionstring ) }
+    handler: () => { console.log( openpgp.config.versionString ) }
   })
   .help()
   .alias('help', 'h')

@@ -9,15 +9,15 @@ const BAD_DATA = 41;
 const verify = async (signature, certfile) => {
 
   const buf = fs.readFileSync(certfile);
-  let readKey = await utils.load_certs(certfile);
-  const cert = readKey.keys[0];
+  const certs = await utils.load_certs(certfile);
+  const cert = certs[0];
   const sigBuf = fs.readFileSync(signature);
   let sig;
   try {
-    sig = await openpgp.signature.read(sigBuf);
+    sig = await openpgp.readSignature({ binarySignature: sigBuf });
   } catch (e) {
     try {
-      sig = await openpgp.signature.readArmored(sigBuf);
+      sig = await openpgp.readSignature({ armoredSignature: sigBuf.toString('utf8') });
     } catch (e) {
       console.error(e);
       return process.exit(BAD_DATA);
@@ -27,21 +27,29 @@ const verify = async (signature, certfile) => {
   const data = utils.read_stdin();
 
   let options = {
-    message: openpgp.message.fromText(data),
-    publicKeys: [cert],
+    message: await openpgp.createMessage({ text: data.toString('utf8') }),
+    verificationKeys: [cert],
     signature: sig,
   };
 
   openpgp.verify(options).then(async (sig) => {
     let count = 0;
     for (s of sig.signatures) {
-      if (await s.verified) {
+      let verified;
+      try {
+        verified = await s.verified;
+      } catch (e) {
+        console.error(e);
+        verified = false;
+      }
+      if (verified) {
         count += 1;
-        const timestamp = utils.format_date(s.signature.packets[0].created);
-        const signKey = await cert.getSigningKey(s.signature.issuerKeyId, null);
+        const signature = await s.signature;
+        const timestamp = utils.format_date(signature.packets[0].created);
+        const signKey = await cert.getSigningKey(s.keyId, null);
         console.log(timestamp
                     + ' ' + signKey.getFingerprint()
-                    + ' ' + cert.primaryKey.getFingerprint());
+                    + ' ' + cert.getFingerprint());
       }
     }
 

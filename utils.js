@@ -7,14 +7,16 @@ const BAD_DATA = 41;
 const load_certs = async (filename) => {
     const buf = fs.readFileSync(filename);
 
-    let certs = await openpgp.key.read(buf);
-    if (!certs.keys[0]) {
-	try {
-	    certs = await openpgp.key.readArmored(buf);
-	} catch (e) {
-	    console.error(e);
-	    return process.exit(BAD_DATA);
-	}
+    let certs;
+    try {
+      certs = await openpgp.readKeys({ binaryKeys: buf });
+    } catch (e) {
+      try {
+        certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
+      } catch (e) {
+        console.error(e);
+        return process.exit(BAD_DATA);
+      }
     }
 
     return certs;
@@ -23,14 +25,16 @@ const load_certs = async (filename) => {
 const load_keys = async (filename) => {
     const buf = fs.readFileSync(filename);
 
-    let keys = await openpgp.key.read(buf);
-    if (!keys.keys[0]) {
-	try {
-	    keys = await openpgp.key.readArmored(buf);
-	} catch (e) {
-	    console.error(e);
-	    return process.exit(BAD_DATA);
-	}
+    let keys;
+    try {
+      keys = await openpgp.readPrivateKeys({ binaryKeys: buf });
+    } catch (e) {
+      try {
+        keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
+      } catch (e) {
+        console.error(e);
+        return process.exit(BAD_DATA);
+      }
     }
 
     return keys;

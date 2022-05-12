@@ -1,22 +1,19 @@
 const openpgp = require('openpgp');
-const fs = require('fs');
 const utils = require('./utils');
 
 const sign = async (certfile) => {
 
-  let readKey = await utils.load_keys(certfile);
-  const cert = readKey.keys[0];
   const data = utils.read_stdin();
 
-  let options = {
-    message: openpgp.message.fromText(data),
-    privateKeys: [cert],
-    armor: true,
+  const options = {
+    message: await openpgp.createMessage({ text: data.toString('utf8') }),
+    signingKeys: await utils.load_keys(certfile),
+    format: 'armored',
     detached: true
   };
 
-  openpgp.sign(options).then( async (signed) => {
-    process.stdout.write(signed.signature);
+  openpgp.sign(options).then(async (signature) => {
+    process.stdout.write(signature);
   });
 };
 

@@ -10,34 +10,29 @@ const encrypt = async (withPassword, signWith, certfile) => {
   if (withPassword) {
     let password = fs.readFileSync(withPassword);
     let options = {
-      message: openpgp.message.fromText(data),
+      message: await openpgp.createMessage({ text: data.toString('utf8') }),
       passwords: password
     }
-    openpgp.encrypt(options).then( (ciphertext) => {
-      process.stdout.write(ciphertext.data);
+    openpgp.encrypt(options).then((ciphertext) => {
+      process.stdout.write(ciphertext);
     });
     return;
   }
 
-  let readKey = await utils.load_certs(certfile);
-  const cert = readKey.keys[0];
-  const aeadSupported = await openpgp.key.isAeadSupported([cert]);
-  if (aeadSupported) {
-    openpgp.config.aead_protect = true;
-  }
   let options = {
-    message: openpgp.message.fromText(data),
-    publicKeys: cert,
-    armor: true
+    message: await openpgp.createMessage({ text: data.toString('utf8') }),
+    encryptionKeys: await utils.load_certs(certfile),
+    format: 'armored',
+    config: {
+      aeadProtect: true
+    }
   };
   if (signWith) {
-    let signKey = utils.load_keys(signWith);
-    options.privateKeys = signKey.keys[0];
+    options.signingKeys = utils.load_keys(signWith);
   }
 
-  openpgp.encrypt(options).then( (ciphertext) => {
-//    encrypted = ciphertext.message.packets.write(); // get raw encrypted packets as Uint8Array
-    process.stdout.write(ciphertext.data);
+  openpgp.encrypt(options).then((ciphertext) => {
+    process.stdout.write(ciphertext);
   }).catch((e) => {
     console.error(e);
     return process.exit(CERT_CANNOT_ENCRYPT);
