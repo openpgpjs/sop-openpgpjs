@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openpgp": "^5.2.1",
+    "openpgp": "^5.3.1",
     "yargs": "^14.2.0"
   }
 }
