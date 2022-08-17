@@ -64,7 +64,10 @@ yargs
       };
       extract(armor, argv.certfile); }
   })
-  .boolean('armor')
+  .option('armor', {
+    describe: 'armor the output',
+    type: 'boolean'
+  })
   .command({
     command: 'generate-key',
     handler: async (argv) => {
@@ -75,7 +78,14 @@ yargs
       };
       generate(armor, userid); }
   })
-  .boolean('armor')
+  .option('backend', {
+    describe: 'display OpenPGP.js version',
+    type: 'boolean'
+  })
+  .option('extended', {
+    describe: 'display extended version information',
+    type: 'boolean'
+  })
   .command({
     command: 'version',
     handler: (argv) => {
