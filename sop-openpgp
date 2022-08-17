@@ -80,21 +80,25 @@ yargs
       extract(armor, argv.certfile); }
   })
   .command({
-    command: 'generate-key',
+    command: 'generate-key [userids..]',
     describe: 'Generate a Secret Key',
     builder: {
       armor: {
         describe: 'armor the output',
         type: 'boolean'
+      },
+      userids: {
+        describe: 'some user ids',
+        type: 'string'
       }
     },
     handler: async (argv) => {
-      const userid = argv._.slice(1);
+      const userids = argv.userids || [];
       let armor = true;
       if (argv.armor == false) {
         armor = false;
       };
-      generate(armor, userid); }
+      generate(armor, userids); }
   })
   .command({
     command: 'version',
