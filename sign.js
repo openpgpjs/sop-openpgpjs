@@ -1,3 +1,5 @@
+/*global process*/
+
 const openpgp = require('openpgp');
 const utils = require('./utils');
 

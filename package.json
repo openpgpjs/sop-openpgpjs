@@ -4,7 +4,8 @@
   "description": "",
   "main": "sop-openpgp.js",
   "scripts": {
-    "test": "test/run"
+    "test": "test/run",
+    "lint": "eslint sop-openpgp *.js"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +13,8 @@
   "dependencies": {
     "openpgp": "^5.4.0",
     "yargs": "^14.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.22.0"
   }
 }

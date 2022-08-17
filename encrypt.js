@@ -12,7 +12,7 @@ const encrypt = async (withPassword, signWith, certfile) => {
     let options = {
       message: await openpgp.createMessage({ text: data.toString('utf8') }),
       passwords: password
-    }
+    };
     openpgp.encrypt(options).then((ciphertext) => {
       process.stdout.write(ciphertext);
     });

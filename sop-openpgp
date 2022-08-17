@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+/*global process*/
+
 const yargs = require('yargs');
 
 const encrypt = require('./encrypt');
@@ -76,8 +79,9 @@ yargs
     handler: async (argv) => { let armor = true;
       if (argv.armor == false) {
         armor = false;
-      };
-      extract(armor, argv.certfile); }
+      }
+      extract(armor, argv.certfile);
+    }
   })
   .command({
     command: 'generate-key [userids..]',
@@ -97,8 +101,9 @@ yargs
       let armor = true;
       if (argv.armor == false) {
         armor = false;
-      };
-      generate(armor, userids); }
+      }
+      generate(armor, userids);
+    }
   })
   .command({
     command: 'version',

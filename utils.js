@@ -5,54 +5,54 @@ const process = require('process');
 const BAD_DATA = 41;
 
 const load_certs = async (filename) => {
-    const buf = fs.readFileSync(filename);
+  const buf = fs.readFileSync(filename);
 
-    let certs;
+  let certs;
+  try {
+    certs = await openpgp.readKeys({ binaryKeys: buf });
+  } catch (e) {
     try {
-      certs = await openpgp.readKeys({ binaryKeys: buf });
+      certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
     } catch (e) {
-      try {
-        certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
-      } catch (e) {
-        console.error(e);
-        return process.exit(BAD_DATA);
-      }
+      console.error(e);
+      return process.exit(BAD_DATA);
     }
+  }
 
-    return certs;
-}
+  return certs;
+};
 
 const load_keys = async (filename) => {
-    const buf = fs.readFileSync(filename);
+  const buf = fs.readFileSync(filename);
 
-    let keys;
+  let keys;
+  try {
+    keys = await openpgp.readPrivateKeys({ binaryKeys: buf });
+  } catch (e) {
     try {
-      keys = await openpgp.readPrivateKeys({ binaryKeys: buf });
+      keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
     } catch (e) {
-      try {
-        keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
-      } catch (e) {
-        console.error(e);
-        return process.exit(BAD_DATA);
-      }
+      console.error(e);
+      return process.exit(BAD_DATA);
     }
+  }
 
-    return keys;
-}
+  return keys;
+};
 
 const read_stdin = () => {
-    // Using the file descriptor 0 is unreliable, because EAGAIN is
-    // not handled.  Using '/dev/stdin' works better, but will not
-    // work on non-posixly systems.
-    return fs.readFileSync('/dev/stdin');
-}
+  // Using the file descriptor 0 is unreliable, because EAGAIN is
+  // not handled.  Using '/dev/stdin' works better, but will not
+  // work on non-posixly systems.
+  return fs.readFileSync('/dev/stdin');
+};
 
 // Emits a Date as specified in Section 5.9 of the SOP spec.
 const format_date = (d) => {
-    // E.g.: 2019-10-24T23:48:29Z
-    return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}T`
-	+ `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}Z`;
-}
+  // E.g.: 2019-10-24T23:48:29Z
+  return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}T` +
+    `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}Z`;
+};
 
 module.exports.load_certs = load_certs;
 module.exports.load_keys = load_keys;
