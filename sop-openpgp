@@ -78,7 +78,18 @@ yargs
   .boolean('armor')
   .command({
     command: 'version',
-    handler: () => { console.log( openpgp.config.versionString ) }
+    handler: (argv) => {
+      if (!argv.backend || argv.extended) {
+        const package = require('./package.json');
+        console.log(package.name + ' ' + package.version);
+      }
+      if (argv.backend || argv.extended) {
+        console.log(openpgp.config.versionString);
+      }
+      if (argv.extended) {
+        console.log('Running on Node.js ' + process.version);
+      }
+    }
   })
   .help()
   .alias('help', 'h')
