@@ -12,64 +12,82 @@ const openpgp = require('openpgp');
 yargs
   .command({
     command: 'encrypt [certfile]',
+    describe: 'Encrypt a Message',
+    builder: {
+      'with-password': {
+        describe: 'symmetric encryption',
+        type: 'string'
+      },
+      'sign-with': {
+        describe: 'sign with key',
+      },
+      as: {
+        describe: 'binary or text'
+      }
+    },
     handler: async (argv) => {
       encrypt(argv.withPassword, argv.signWith, argv.certfile);
     }
   })
-  .option('with-password', {
-    describe: 'symmetric encryption',
-    type: 'string'
-  })
-  .option('sign-with', {
-    describe: 'sign with key',
-  })
-  .option('as', {
-    describe: 'binary or text'
-  })
   .command({
     command: 'decrypt [certfile]',
+    describe: 'Decrypt a Message',
+    builder: {
+      'session-key-out': {
+        describe: 'session key of encrypted message',
+      },
+      'with-session-key': {
+        describe: 'decrypt using provided session key',
+      },
+      'with-password': {
+        describe: 'symmetric encryption',
+        type: 'string'
+      },
+      'verify-with': {
+        describe: 'verify with key',
+      },
+      'verify-out': {
+        describe: 'save verifications to file',
+      }
+    },
     handler: async (argv) => {
       decrypt(argv.withPassword, argv.sessionKeyOut , argv.withSessionKey, argv.verifyWith, argv.verifyOut, argv.certfile);
     }
   })
-  .option('session-key-out', {
-    describe: 'session key of encrypted message',
-  })
-  .option('with-session-key', {
-    describe: 'decrypt using provided session key',
-  })
-  .option('with-password', {
-    describe: 'symmetric encryption',
-    type: 'string'
-  })
-  .option('verify-with', {
-    describe: 'verify with key',
-  })
-  .option('verify-out', {
-    describe: 'save verifications to file',
-  })
   .command({
     command: 'sign <certfile>',
+    describe: 'Create Detached Signatures',
     handler: async (argv) => { sign(argv.certfile); }
   })
   .command({
     command: 'verify <signature> <certfile>',
+    describe: 'Verify Detached Signatures',
     handler: async (argv) => { verify(argv.signature, argv.certfile); }
   })
   .command({
     command: 'extract-cert <certfile>',
+    describe: 'Extract a Certificate from a Secret Key',
+    builder: {
+      armor: {
+        describe: 'armor the output',
+        type: 'boolean'
+      }
+    },
     handler: async (argv) => { let armor = true;
       if (argv.armor == false) {
         armor = false;
       };
       extract(armor, argv.certfile); }
   })
-  .option('armor', {
-    describe: 'armor the output',
-    type: 'boolean'
-  })
   .command({
     command: 'generate-key',
+    describe: 'Generate a Secret Key',
+    builder: {
+      armor: {
+        describe: 'armor the output',
+        type: 'boolean'
+      }
+    },
     handler: async (argv) => {
       const userid = argv._.slice(1);
       let armor = true;
@@ -78,16 +96,19 @@ yargs
       };
       generate(armor, userid); }
   })
-  .option('backend', {
-    describe: 'display OpenPGP.js version',
-    type: 'boolean'
-  })
-  .option('extended', {
-    describe: 'display extended version information',
-    type: 'boolean'
-  })
   .command({
     command: 'version',
+    describe: 'Version Information',
+    builder: {
+      backend: {
+        describe: 'display OpenPGP.js version',
+        type: 'boolean'
+      },
+      extended: {
+        describe: 'display extended version information',
+        type: 'boolean'
+      }
+    },
     handler: (argv) => {
       if (!argv.backend || argv.extended) {
         const package = require('./package.json');
