@@ -101,6 +101,7 @@ yargs
       }
     }
   })
+  .version(false) // Disable --version option as we have our own version command.
   .help()
   .alias('help', 'h')
   .argv;
