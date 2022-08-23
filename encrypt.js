@@ -8,8 +8,8 @@ const CERT_CANNOT_ENCRYPT = 17;
 const encrypt = async (withPassword, signWith, certfile) => {
   const data = utils.read_stdin();
   if (withPassword) {
-    let password = fs.readFileSync(withPassword);
-    let options = {
+    const password = fs.readFileSync(withPassword);
+    const options = {
       message: await openpgp.createMessage({ text: data.toString('utf8') }),
       passwords: password
     };
@@ -19,7 +19,7 @@ const encrypt = async (withPassword, signWith, certfile) => {
     return;
   }
 
-  let options = {
+  const options = {
     message: await openpgp.createMessage({ text: data.toString('utf8') }),
     encryptionKeys: await utils.load_certs(certfile),
     format: 'armored',

@@ -4,7 +4,7 @@ const process = require('process');
 const BAD_DATA = 41;
 
 const generateKey = async (armor, userids) => {
-  let options = {
+  const options = {
     userIDs: userids.map((userid) => ({
       name: userid
     })),

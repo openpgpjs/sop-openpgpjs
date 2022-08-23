@@ -25,8 +25,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   if (withPassword) {
-    let password = fs.readFileSync(withPassword);
-    let options = {
+    const password = fs.readFileSync(withPassword);
+    const options = {
       message: message,
       passwords: password
     };
@@ -40,12 +40,12 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   if (withSessionKey) {
-    let sessionBuf = fs.readFileSync(withSessionKey);
+    const sessionBuf = fs.readFileSync(withSessionKey);
     const sessionKey = {
       data: sessionBuf,
       algorithm: 'aes256'
     };
-    let options = {
+    const options = {
       message: message,
       sessionKeys: sessionKey
     };
@@ -74,7 +74,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     process.stdout.write(clearText.data);
     if (verifyOut) {
       let verifications = '';
-      for (let s of clearText.signatures) {
+      for (const s of clearText.signatures) {
         let verified;
         try {
           verified = await s.verified;

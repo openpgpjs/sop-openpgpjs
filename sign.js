@@ -4,7 +4,6 @@ const openpgp = require('openpgp');
 const utils = require('./utils');
 
 const sign = async (certfile) => {
-
   const data = utils.read_stdin();
 
   const options = {

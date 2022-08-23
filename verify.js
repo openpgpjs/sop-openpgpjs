@@ -7,7 +7,6 @@ const NO_SIGNATURE = 3;
 const BAD_DATA = 41;
 
 const verify = async (signature, certfile) => {
-
   const certs = await utils.load_certs(certfile);
   const cert = certs[0];
   const sigBuf = fs.readFileSync(signature);
@@ -25,7 +24,7 @@ const verify = async (signature, certfile) => {
 
   const data = utils.read_stdin();
 
-  let options = {
+  const options = {
     message: await openpgp.createMessage({ text: data.toString('utf8') }),
     verificationKeys: [cert],
     signature: sig,
@@ -33,7 +32,7 @@ const verify = async (signature, certfile) => {
 
   openpgp.verify(options).then(async (sig) => {
     let count = 0;
-    for (let s of sig.signatures) {
+    for (const s of sig.signatures) {
       let verified;
       try {
         verified = await s.verified;
