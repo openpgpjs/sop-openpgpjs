@@ -1,10 +1,16 @@
 const openpgp = require('openpgp');
+const fs = require('fs');
 const process = require('process');
 
 const BAD_DATA = 41;
 
-const generateKey = async (armor, userids) => {
+const generateKey = async (withKeyPassword, armor, userids) => {
+  let passphrase;
+  if (withKeyPassword) {
+    passphrase = fs.readFileSync(withKeyPassword, 'utf8').trimEnd();
+  }
   const options = {
+    passphrase,
     userIDs: userids.map((userid) => ({
       name: userid
     })),

@@ -48,3 +48,26 @@ echo 'Test inline detaching clearsigned message signature'
 
 echo 'Test generating key'
 ./sop-openpgp generate-key 'alice <alice@alice.ch>'
+
+key=$(mktemp)
+trap "rm -f $key" 0 2 3 15
+
+echo 'Test generating key with password'
+./sop-openpgp generate-key --with-key-password=test/password.txt 'alice <alice@alice.ch>' > $key
+
+echo 'Test encrypting and decrypting with generated key... success.' |
+./sop-openpgp encrypt $key |
+./sop-openpgp decrypt $key --with-key-password=test/password.txt
+
+sig=$(mktemp)
+trap "rm -f $sig" 0 2 3 15
+
+echo 'Test detached signing with generated key'
+./sop-openpgp sign $key --with-key-password=test/password.txt < test/message.txt > $sig
+
+echo 'Test detached verifying with generated key'
+./sop-openpgp verify $sig $key < test/message.txt
+
+echo 'Test inline signing and verifying with generated key' |
+./sop-openpgp inline-sign $key --with-key-password=test/password.txt |
+./sop-openpgp inline-verify $key

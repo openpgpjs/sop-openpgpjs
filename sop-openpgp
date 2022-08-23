@@ -49,6 +49,10 @@ yargs
         describe: 'symmetric encryption',
         type: 'string'
       },
+      'with-key-password': {
+        describe: 'unlock key with the given password file',
+        type: 'string'
+      },
       'verify-with': {
         describe: 'verify with key',
       },
@@ -57,13 +61,19 @@ yargs
       }
     },
     handler: async (argv) => {
-      decrypt(argv.withPassword, argv.sessionKeyOut , argv.withSessionKey, argv.verifyWith, argv.verifyOut, argv.certfile);
+      decrypt(argv.withPassword, argv.sessionKeyOut , argv.withSessionKey, argv.verifyWith, argv.verifyOut, argv.certfile, argv.withKeyPassword);
     }
   })
   .command({
     command: 'sign <certfile>',
     describe: 'Create Detached Signatures',
-    handler: async (argv) => { sign(argv.certfile); }
+    builder: {
+      'with-key-password': {
+        describe: 'unlock key with the given password file',
+        type: 'string'
+      }
+    },
+    handler: async (argv) => { sign(argv.certfile, argv.withKeyPassword); }
   })
   .command({
     command: 'verify <signature> <certfile>',
@@ -74,6 +84,10 @@ yargs
     command: 'inline-sign <certfile>',
     describe: 'Create an Inline-Signed Message',
     builder: {
+      'with-key-password': {
+        describe: 'unlock key with the given password file',
+        type: 'string'
+      },
       as: {
         describe: 'binary or text'
       },
@@ -84,7 +98,7 @@ yargs
     },
     handler: async (argv) => {
       const armor = argv.armor != false;
-      inlineSign(argv.certfile, argv.as, armor);
+      inlineSign(argv.certfile, argv.withKeyPassword, argv.as, armor);
     }
   })
   .command({
@@ -132,6 +146,10 @@ yargs
     command: 'generate-key [userids..]',
     describe: 'Generate a Secret Key',
     builder: {
+      'with-key-password': {
+        describe: 'lock key with the given password file',
+        type: 'string'
+      },
       armor: {
         describe: 'armor the output',
         type: 'boolean'
@@ -144,7 +162,7 @@ yargs
     handler: async (argv) => {
       const armor = argv.armor != false;
       const userids = argv.userids || [];
-      generate(armor, userids);
+      generate(argv.withKeyPassword, armor, userids);
     }
   })
   .command({

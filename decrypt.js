@@ -6,7 +6,7 @@ const utils = require('./utils');
 const CANNOT_DECRYPT = 29;
 const BAD_DATA = 41;
 
-const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verifyOut, certfile) => {
+const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verifyOut, certfile, withKeyPassword) => {
   const encrypted = utils.read_stdin();
   let message;
   try {
@@ -58,10 +58,17 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     return;
   }
 
-  const certs = await utils.load_keys(certfile);
+  let decryptionKeys = await utils.load_keys(certfile);
+  if (withKeyPassword) {
+    const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
+    decryptionKeys = await Promise.all(decryptionKeys.map(privateKey => openpgp.decryptKey({
+      privateKey,
+      passphrase: [keyPassword, keyPassword.trimEnd()]
+    })));
+  }
   const options = {
-    message: message,
-    decryptionKeys: certs
+    message,
+    decryptionKeys
   };
 
   let verificationKeys;
