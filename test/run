@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 echo 'Test encrypting and decrypting with armored key... success.' |
 ./sop-openpgp encrypt test/testkey.asc |
 ./sop-openpgp decrypt test/testkey.sec.asc
@@ -11,11 +13,29 @@ echo 'Test encrypting and decrypting with password' |
 ./sop-openpgp encrypt --with-password=test/password.txt |
 ./sop-openpgp decrypt --with-password=test/password.txt
 
-echo 'Test signing' |
+echo 'Test detached signing' |
 ./sop-openpgp sign test/alice.sec
 
-echo 'test verifyng message signature'
+echo 'Test detached verifying message signature'
 ./sop-openpgp verify test/detached-sig.txt test/alice.asc < test/message.txt
 
-echo 'test generating key'
+echo 'Test inline signing' |
+./sop-openpgp inline-sign test/alice.sec
+
+echo 'Test inline verifying message signature'
+./sop-openpgp inline-verify test/alice.asc < test/signed-text-message.txt
+
+echo 'Test inline signing binary' |
+./sop-openpgp inline-sign --as=binary test/alice.sec
+
+echo 'Test inline verifying binary message signature'
+./sop-openpgp inline-verify test/alice.asc < test/signed-binary-message.txt
+
+echo 'Test inline signing clearsigned' |
+./sop-openpgp inline-sign --as=clearsigned test/alice.sec
+
+echo 'Test inline verifying clearsigned message signature'
+./sop-openpgp inline-verify test/alice.asc < test/clearsigned-message.txt
+
+echo 'Test generating key'
 ./sop-openpgp generate-key 'alice <alice@alice.ch>'

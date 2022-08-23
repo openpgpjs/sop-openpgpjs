@@ -8,6 +8,8 @@ const encrypt = require('./encrypt');
 const decrypt = require('./decrypt');
 const sign = require('./sign');
 const verify = require('./verify');
+const inlineSign = require('./inlineSign');
+const inlineVerify = require('./inlineVerify');
 const generate = require('./generate');
 const extract = require('./extract');
 const openpgp = require('openpgp');
@@ -66,6 +68,33 @@ yargs
     command: 'verify <signature> <certfile>',
     describe: 'Verify Detached Signatures',
     handler: async (argv) => { verify(argv.signature, argv.certfile); }
+  })
+  .command({
+    command: 'inline-sign <certfile>',
+    describe: 'Create an Inline-Signed Message',
+    builder: {
+      as: {
+        describe: 'binary or text'
+      },
+      armor: {
+        describe: 'armor the output',
+        type: 'boolean'
+      }
+    },
+    handler: async (argv) => {
+      const armor = argv.armor != false;
+      inlineSign(argv.certfile, argv.as, armor);
+    }
+  })
+  .command({
+    command: 'inline-verify <certfile>',
+    describe: 'Verify an Inline-Signed Message',
+    builder: {
+      'verifications-out': {
+        describe: 'save verifications to file',
+      }
+    },
+    handler: async (argv) => { inlineVerify(argv.certfile, argv.verificationsOut); }
   })
   .command({
     command: 'extract-cert <certfile>',
