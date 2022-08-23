@@ -10,6 +10,7 @@ const sign = require('./sign');
 const verify = require('./verify');
 const inlineSign = require('./inlineSign');
 const inlineVerify = require('./inlineVerify');
+const inlineDetach = require('./inlineDetach');
 const generate = require('./generate');
 const extract = require('./extract');
 const openpgp = require('openpgp');
@@ -95,6 +96,23 @@ yargs
       }
     },
     handler: async (argv) => { inlineVerify(argv.certfile, argv.verificationsOut); }
+  })
+  .command({
+    command: 'inline-detach <certfile>',
+    describe: 'Split Signatures from an Inline-Signed Message',
+    builder: {
+      'signatures-out': {
+        describe: 'save signatures to file',
+      },
+      armor: {
+        describe: 'armor the signatures',
+        type: 'boolean'
+      }
+    },
+    handler: async (argv) => {
+      const armor = argv.armor != false;
+      inlineDetach(argv.signaturesOut, armor);
+    }
   })
   .command({
     command: 'extract-cert <certfile>',

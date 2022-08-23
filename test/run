@@ -25,17 +25,26 @@ echo 'Test inline signing' |
 echo 'Test inline verifying message signature'
 ./sop-openpgp inline-verify test/alice.asc < test/signed-text-message.txt
 
+echo 'Test inline detaching message signature'
+./sop-openpgp inline-detach test/alice.asc < test/signed-text-message.txt
+
 echo 'Test inline signing binary' |
 ./sop-openpgp inline-sign --as=binary test/alice.sec
 
 echo 'Test inline verifying binary message signature'
 ./sop-openpgp inline-verify test/alice.asc < test/signed-binary-message.txt
 
+echo 'Test inline detaching binary message signature'
+./sop-openpgp inline-detach test/alice.asc < test/signed-binary-message.txt
+
 echo 'Test inline signing clearsigned' |
 ./sop-openpgp inline-sign --as=clearsigned test/alice.sec
 
 echo 'Test inline verifying clearsigned message signature'
 ./sop-openpgp inline-verify test/alice.asc < test/clearsigned-message.txt
+
+echo 'Test inline detaching clearsigned message signature'
+./sop-openpgp inline-detach test/alice.asc < test/clearsigned-message.txt
 
 echo 'Test generating key'
 ./sop-openpgp generate-key 'alice <alice@alice.ch>'
