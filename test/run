@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
+key=$(mktemp)
+sig=$(mktemp)
+ver=$(mktemp)
+sk=$(mktemp)
+
+trap "rm -f $key $sig $ver $sk" 0 2 3 15
+
 echo 'Test encrypting and decrypting with armored key... success.' |
 ./sop-openpgp encrypt test/testkey.asc |
 ./sop-openpgp decrypt test/testkey.sec.asc
@@ -9,17 +16,20 @@ echo 'Test encrypting and decrypting with binary key... success.' |
 ./sop-openpgp encrypt test/testkey.pgp |
 ./sop-openpgp decrypt test/testkey.sec.pgp
 
-echo 'Test encrypting and decrypting with password' |
+echo 'Test encrypting and decrypting with password... success.' |
 ./sop-openpgp encrypt --with-password=test/password.txt |
 ./sop-openpgp decrypt --with-password=test/password.txt
-
-sk=$(mktemp)
-trap "rm -f $sk" 0 2 3 15
 
 echo 'Test decrypting with session key'
 ./sop-openpgp decrypt test/testkey.sec.asc --session-key-out=$sk < test/encrypted-message.asc
 ./sop-openpgp decrypt --with-session-key=$sk < test/encrypted-message.asc
 ./sop-openpgp decrypt --with-session-key=<( echo "9:15DC6A120BAD8E9C0847A318BF41BEF60A970B8716D86BADC8D3D31BF14C9728" ) < test/encrypted-message.asc
+
+echo 'Test encrypting+signing and decrypting+verifying... success.' |
+./sop-openpgp encrypt --sign-with=test/testkey.sec.asc test/testkey.asc |
+./sop-openpgp decrypt --verify-with=test/testkey.asc --verifications-out=$ver test/testkey.sec.asc
+
+diff $ver <( date -u +"%Y-%m-%dT%H:%M:%SZ 8942C62D6026B46909E9E13C8ED6C55EB972153C 8942C62D6026B46909E9E13C8ED6C55EB972153C" )
 
 echo 'Test detached signing' |
 ./sop-openpgp sign test/alice.sec
@@ -57,9 +67,6 @@ echo 'Test inline detaching clearsigned message signature'
 echo 'Test generating key'
 ./sop-openpgp generate-key 'alice <alice@alice.ch>'
 
-key=$(mktemp)
-trap "rm -f $key" 0 2 3 15
-
 echo 'Test generating key with password'
 ./sop-openpgp generate-key --with-key-password=test/password.txt 'alice <alice@alice.ch>' > $key
 
@@ -67,8 +74,9 @@ echo 'Test encrypting and decrypting with generated key... success.' |
 ./sop-openpgp encrypt $key |
 ./sop-openpgp decrypt $key --with-key-password=test/password.txt
 
-sig=$(mktemp)
-trap "rm -f $sig" 0 2 3 15
+echo 'Test encrypting+signing and decrypting+verifying with generated key... success.' |
+./sop-openpgp encrypt --sign-with=$key --with-key-password=test/password.txt $key |
+./sop-openpgp decrypt --verify-with=$key --verifications-out=$ver $key --with-key-password=test/password.txt
 
 echo 'Test detached signing with generated key'
 ./sop-openpgp sign $key --with-key-password=test/password.txt < test/message.txt > $sig
