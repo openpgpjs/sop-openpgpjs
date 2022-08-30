@@ -4,85 +4,123 @@ set -e
 key=$(mktemp)
 sig=$(mktemp)
 ver=$(mktemp)
+res=$(mktemp)
 sk=$(mktemp)
 
 trap "rm -f $key $sig $ver $sk" 0 2 3 15
 
-echo 'Test encrypting and decrypting with armored key... success.' |
+echo 'Test encrypting and decrypting with armored key'
+cat test/message.txt |
 ./sop-openpgp encrypt test/testkey.asc |
-./sop-openpgp decrypt test/testkey.sec.asc
+./sop-openpgp decrypt test/testkey.sec.asc > $res
+diff $res test/message.txt
 
-echo 'Test encrypting and decrypting with binary key... success.' |
+echo 'Test encrypting and decrypting with binary key'
+cat test/message.txt |
 ./sop-openpgp encrypt test/testkey.pgp |
-./sop-openpgp decrypt test/testkey.sec.pgp
+./sop-openpgp decrypt test/testkey.sec.pgp > $res
+diff $res test/message.txt
 
-echo 'Test encrypting and decrypting with password... success.' |
+echo 'Test encrypting and decrypting with password'
+cat test/message.txt |
 ./sop-openpgp encrypt --with-password=test/password.txt |
-./sop-openpgp decrypt --with-password=test/password.txt
+./sop-openpgp decrypt --with-password=test/password.txt > $res
+diff $res test/message.txt
 
 echo 'Test decrypting with session key'
-./sop-openpgp decrypt test/testkey.sec.asc --session-key-out=$sk < test/encrypted-message.asc
-./sop-openpgp decrypt --with-session-key=$sk < test/encrypted-message.asc
-./sop-openpgp decrypt --with-session-key=<( echo "9:15DC6A120BAD8E9C0847A318BF41BEF60A970B8716D86BADC8D3D31BF14C9728" ) < test/encrypted-message.asc
+./sop-openpgp decrypt test/testkey.sec.asc --session-key-out=$sk < test/encrypted-message.asc > $res
+diff $res test/message.txt
+./sop-openpgp decrypt --with-session-key=$sk < test/encrypted-message.asc > $res
+diff $res test/message.txt
+./sop-openpgp decrypt --with-session-key=<( echo "9:15DC6A120BAD8E9C0847A318BF41BEF60A970B8716D86BADC8D3D31BF14C9728" ) < test/encrypted-message.asc > $res
+diff $res test/message.txt
 
-echo 'Test encrypting+signing and decrypting+verifying... success.' |
+echo 'Test encrypting+signing and decrypting+verifying'
+now=$( date -u +"%Y-%m-%dT%H:%M:%SZ" )
+cat test/message.txt |
 ./sop-openpgp encrypt --sign-with=test/testkey.sec.asc test/testkey.asc |
-./sop-openpgp decrypt --verify-with=test/testkey.asc --verifications-out=$ver test/testkey.sec.asc
+./sop-openpgp decrypt --verify-with=test/testkey.asc --verifications-out=$ver test/testkey.sec.asc > $res
+diff $res test/message.txt
+diff $ver <( echo "$now 8942C62D6026B46909E9E13C8ED6C55EB972153C 8942C62D6026B46909E9E13C8ED6C55EB972153C" )
 
-diff $ver <( date -u +"%Y-%m-%dT%H:%M:%SZ 8942C62D6026B46909E9E13C8ED6C55EB972153C 8942C62D6026B46909E9E13C8ED6C55EB972153C" )
-
-echo 'Test detached signing' |
-./sop-openpgp sign test/alice.sec
+echo 'Test detached signing and verifying'
+now=$( date -u +"%Y-%m-%dT%H:%M:%SZ" )
+cat test/message.txt |
+./sop-openpgp sign test/alice.sec > $sig
+./sop-openpgp verify $sig test/alice.asc < test/message.txt > $ver
+diff $ver <( echo "$now 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A" )
 
 echo 'Test detached verifying message signature'
-./sop-openpgp verify test/detached-sig.txt test/alice.asc < test/message.txt
+./sop-openpgp verify test/detached-sig.txt test/alice.asc < test/message.txt > $ver
+diff $ver <( echo "2020-03-30T12:09:26Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A" )
 
-echo 'Test inline signing' |
-./sop-openpgp inline-sign test/alice.sec
+echo 'Test inline signing and verifying'
+cat test/message.txt |
+./sop-openpgp inline-sign test/alice.sec |
+./sop-openpgp inline-verify test/alice.asc > $res
+diff $res test/message.txt
 
 echo 'Test inline verifying message signature'
-./sop-openpgp inline-verify test/alice.asc < test/signed-text-message.txt
+./sop-openpgp inline-verify test/alice.asc < test/signed-text-message.txt > $res
+diff $res test/message.txt
 
 echo 'Test inline detaching message signature'
-./sop-openpgp inline-detach test/alice.asc < test/signed-text-message.txt
+./sop-openpgp inline-detach test/alice.asc < test/signed-text-message.txt > $res
+diff $res test/message.txt
 
-echo 'Test inline signing binary' |
-./sop-openpgp inline-sign --as=binary test/alice.sec
+echo 'Test inline signing binary'
+cat test/message.txt |
+./sop-openpgp inline-sign --as=binary test/alice.sec |
+./sop-openpgp inline-verify test/alice.asc > $res
+diff $res test/message.txt
 
 echo 'Test inline verifying binary message signature'
-./sop-openpgp inline-verify test/alice.asc < test/signed-binary-message.txt
+./sop-openpgp inline-verify test/alice.asc < test/signed-binary-message.txt > $res
+diff $res test/message.txt
 
 echo 'Test inline detaching binary message signature'
-./sop-openpgp inline-detach test/alice.asc < test/signed-binary-message.txt
+./sop-openpgp inline-detach test/alice.asc < test/signed-binary-message.txt > $res
+diff $res test/message.txt
 
-echo 'Test inline signing clearsigned' |
-./sop-openpgp inline-sign --as=clearsigned test/alice.sec
+echo 'Test inline signing clearsigned'
+cat test/message.txt |
+./sop-openpgp inline-sign --as=clearsigned test/alice.sec |
+./sop-openpgp inline-verify test/alice.asc > $res
+diff $res test/message.txt
 
 echo 'Test inline verifying clearsigned message signature'
-./sop-openpgp inline-verify test/alice.asc < test/clearsigned-message.txt
+./sop-openpgp inline-verify test/alice.asc < test/clearsigned-message.txt > $res
+diff $res test/message.txt
 
 echo 'Test inline detaching clearsigned message signature'
-./sop-openpgp inline-detach test/alice.asc < test/clearsigned-message.txt
+./sop-openpgp inline-detach test/alice.asc < test/clearsigned-message.txt > $res
+diff $res test/message.txt
 
 echo 'Test generating key'
-./sop-openpgp generate-key 'alice <alice@alice.ch>'
+./sop-openpgp generate-key 'alice <alice@alice.ch>' > $key
 
 echo 'Test generating key with password'
 ./sop-openpgp generate-key --with-key-password=test/password.txt 'alice <alice@alice.ch>' > $key
 
-echo 'Test encrypting and decrypting with generated key... success.' |
+echo 'Test encrypting and decrypting with generated key'
+cat test/message.txt |
 ./sop-openpgp encrypt $key |
-./sop-openpgp decrypt $key --with-key-password=test/password.txt
+./sop-openpgp decrypt $key --with-key-password=test/password.txt > $res
+diff $res test/message.txt
 
-echo 'Test encrypting+signing and decrypting+verifying with generated key... success.' |
+echo 'Test encrypting+signing and decrypting+verifying with generated key'
+cat test/message.txt |
 ./sop-openpgp encrypt --sign-with=$key --with-key-password=test/password.txt $key |
-./sop-openpgp decrypt --verify-with=$key --verifications-out=$ver $key --with-key-password=test/password.txt
+./sop-openpgp decrypt --verify-with=$key --verifications-out=$ver $key --with-key-password=test/password.txt > $res
+diff $res test/message.txt
+diff <( wc -l < $ver ) <( echo 1 )
 
 echo 'Test detached signing with generated key'
 ./sop-openpgp sign $key --with-key-password=test/password.txt < test/message.txt > $sig
 
 echo 'Test detached verifying with generated key'
-./sop-openpgp verify $sig $key < test/message.txt
+./sop-openpgp verify $sig $key < test/message.txt > $ver
+diff <( wc -l < $ver ) <( echo 1 )
 
 echo 'Test inline signing and verifying with generated key' |
 ./sop-openpgp inline-sign $key --with-key-password=test/password.txt |
