@@ -1,3 +1,5 @@
+/*global Buffer*/
+
 const openpgp = require('openpgp');
 const fs = require('fs');
 const process = require('process');
@@ -40,10 +42,11 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   if (withSessionKey) {
-    const sessionBuf = fs.readFileSync(withSessionKey);
+    const sessionKeyEncoded = fs.readFileSync(withSessionKey, 'utf8');
+    const [algo, data] = sessionKeyEncoded.split(':');
     const sessionKey = {
-      data: sessionBuf,
-      algorithm: 'aes256'
+      data: Buffer.from(data, 'hex'),
+      algorithm: openpgp.enums.read(openpgp.enums.symmetric, +algo)
     };
     const options = {
       message: message,
@@ -117,7 +120,11 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       message,
       decryptionKeys
     }).then((decryptedSessionKeys) => {
-      fs.writeFileSync(sessionKeyOut, decryptedSessionKeys[0].data);
+      const { algorithm, data } = decryptedSessionKeys[0];
+      const sessionKeyEncoded =
+        openpgp.enums.write(openpgp.enums.symmetric, algorithm) +
+        ':' + Buffer.from(data).toString('hex').toUpperCase();
+      fs.writeFileSync(sessionKeyOut, sessionKeyEncoded);
     }).catch((e) => {
       console.error(e);
       return process.exit(CANNOT_DECRYPT);
