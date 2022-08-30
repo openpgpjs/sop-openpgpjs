@@ -100,8 +100,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
             if (signKey) {
               verifications +=
                 timestamp
-                  + ' ' + signKey.getFingerprint()
-                  + ' ' + cert.getFingerprint()
+                  + ' ' + signKey.getFingerprint().toUpperCase()
+                  + ' ' + cert.getFingerprint().toUpperCase()
                   + '\n';
               break;
             }

@@ -46,8 +46,8 @@ const verify = async (signature, certfile) => {
         const timestamp = utils.format_date(signature.packets[0].created);
         const signKey = await cert.getSigningKey(s.keyId, null);
         console.log(timestamp
-                    + ' ' + signKey.getFingerprint()
-                    + ' ' + cert.getFingerprint());
+                    + ' ' + signKey.getFingerprint().toUpperCase()
+                    + ' ' + cert.getFingerprint().toUpperCase());
       }
     }
 

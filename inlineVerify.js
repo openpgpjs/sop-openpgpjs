@@ -50,8 +50,8 @@ const inlineVerify = async (certfile, verificationsOut) => {
           if (signKey) {
             verifications +=
               timestamp
-                + ' ' + signKey.getFingerprint()
-                + ' ' + cert.getFingerprint()
+                + ' ' + signKey.getFingerprint().toUpperCase()
+                + ' ' + cert.getFingerprint().toUpperCase()
                 + '\n';
             break;
           }
