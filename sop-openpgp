@@ -60,12 +60,13 @@ yargs
       'verify-with': {
         describe: 'verify with key',
       },
-      'verify-out': {
+      'verifications-out': {
         describe: 'save verifications to file',
+        alias: 'verify-out'
       }
     },
     handler: async (argv) => {
-      decrypt(argv.withPassword, argv.sessionKeyOut , argv.withSessionKey, argv.verifyWith, argv.verifyOut, argv.certfile, argv.withKeyPassword);
+      decrypt(argv.withPassword, argv.sessionKeyOut, argv.withSessionKey, argv.verifyWith, argv.verificationsOut, argv.certfile, argv.withKeyPassword);
     }
   })
   .command({

@@ -8,7 +8,7 @@ const utils = require('./utils');
 const CANNOT_DECRYPT = 29;
 const BAD_DATA = 41;
 
-const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verifyOut, certfile, withKeyPassword) => {
+const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, certfile, withKeyPassword) => {
   const encrypted = utils.read_stdin();
   let message;
   try {
@@ -82,7 +82,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   openpgp.decrypt(options).then(async (clearText) => {
     process.stdout.write(clearText.data);
-    if (verifyOut) {
+    if (verificationsOut) {
       let verifications = '';
       for (const s of clearText.signatures) {
         let verified;
@@ -108,7 +108,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
           }
         }
       }
-      fs.writeFileSync(verifyOut, verifications);
+      fs.writeFileSync(verificationsOut, verifications);
     }
   }).catch((e) => {
     console.error(e);
