@@ -13,6 +13,14 @@ echo 'Test encrypting and decrypting with password' |
 ./sop-openpgp encrypt --with-password=test/password.txt |
 ./sop-openpgp decrypt --with-password=test/password.txt
 
+sk=$(mktemp)
+trap "rm -f $sk" 0 2 3 15
+
+echo 'Test decrypting with session key'
+./sop-openpgp decrypt test/testkey.sec.asc --session-key-out=$sk < test/encrypted-message.asc
+./sop-openpgp decrypt --with-session-key=$sk < test/encrypted-message.asc
+./sop-openpgp decrypt --with-session-key=<( echo "9:15DC6A120BAD8E9C0847A318BF41BEF60A970B8716D86BADC8D3D31BF14C9728" ) < test/encrypted-message.asc
+
 echo 'Test detached signing' |
 ./sop-openpgp sign test/alice.sec
 
