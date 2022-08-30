@@ -27,12 +27,16 @@ yargs
       'sign-with': {
         describe: 'sign with key',
       },
+      'with-key-password': {
+        describe: 'unlock signing key with the given password file',
+        type: 'string'
+      },
       as: {
         describe: 'binary or text'
       }
     },
     handler: async (argv) => {
-      encrypt(argv.withPassword, argv.signWith, argv.certfile);
+      encrypt(argv.withPassword, argv.signWith, argv.withKeyPassword, argv.certfile);
     }
   })
   .command({
