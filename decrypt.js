@@ -114,8 +114,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   if (sessionKeyOut) {
     openpgp.decryptSessionKeys({
-      message: message,
-      decryptionKeys: certs
+      message,
+      decryptionKeys
     }).then((decryptedSessionKeys) => {
       fs.writeFileSync(sessionKeyOut, decryptedSessionKeys[0].data);
     }).catch((e) => {
