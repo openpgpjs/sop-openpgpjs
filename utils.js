@@ -49,9 +49,7 @@ const read_stdin = () => {
 
 // Emits a Date as specified in Section 5.9 of the SOP spec.
 const format_date = (d) => {
-  // E.g.: 2019-10-24T23:48:29Z
-  return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}T` +
-    `${d.getUTCHours()}:${d.getUTCMinutes()}:${d.getUTCSeconds()}Z`;
+  return d.toISOString().replace(/\.\d{3}/, ''); // ISO 8601 format without milliseconds.
 };
 
 module.exports.load_certs = load_certs;
