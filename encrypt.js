@@ -22,10 +22,7 @@ const encrypt = async (withPassword, signWith, withKeyPassword, certfile) => {
   const options = {
     message: await openpgp.createMessage({ text: data.toString('utf8') }),
     encryptionKeys: await utils.load_certs(certfile),
-    format: 'armored',
-    config: {
-      aeadProtect: true
-    }
+    format: 'armored'
   };
   if (signWith) {
     let signingKeys = await utils.load_keys(signWith);
