@@ -15,6 +15,10 @@ const generate = require('./generate');
 const extract = require('./extract');
 const openpgp = require('openpgp');
 
+if (process.env.OPENPGPJS_CONFIG) {
+  Object.assign(openpgp.config, JSON.parse(process.env.OPENPGPJS_CONFIG));
+}
+
 yargs
   .command({
     command: 'encrypt [certfile]',
