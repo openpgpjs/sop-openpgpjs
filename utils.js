@@ -4,40 +4,44 @@ const process = require('process');
 
 const BAD_DATA = 41;
 
-const load_certs = async (filename) => {
-  const buf = fs.readFileSync(filename);
+const load_certs = async (...filenames) => {
+  return (await Promise.all(filenames.map(async filename => {
+    const buf = fs.readFileSync(filename);
 
-  let certs;
-  try {
-    certs = await openpgp.readKeys({ binaryKeys: buf });
-  } catch (e) {
+    let certs;
     try {
-      certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
+      certs = await openpgp.readKeys({ binaryKeys: buf });
     } catch (e) {
-      console.error(e);
-      return process.exit(BAD_DATA);
+      try {
+        certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
+      } catch (e) {
+        console.error(e);
+        return process.exit(BAD_DATA);
+      }
     }
-  }
 
-  return certs;
+    return certs;
+  }))).flat();
 };
 
-const load_keys = async (filename) => {
-  const buf = fs.readFileSync(filename);
+const load_keys = async (...filenames) => {
+  return (await Promise.all(filenames.map(async filename => {
+    const buf = fs.readFileSync(filename);
 
-  let keys;
-  try {
-    keys = await openpgp.readPrivateKeys({ binaryKeys: buf });
-  } catch (e) {
+    let keys;
     try {
-      keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
+      keys = await openpgp.readPrivateKeys({ binaryKeys: buf });
     } catch (e) {
-      console.error(e);
-      return process.exit(BAD_DATA);
+      try {
+        keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
+      } catch (e) {
+        console.error(e);
+        return process.exit(BAD_DATA);
+      }
     }
-  }
 
-  return keys;
+    return keys;
+  }))).flat();
 };
 
 const read_stdin = () => {

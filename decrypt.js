@@ -8,7 +8,7 @@ const utils = require('./utils');
 const CANNOT_DECRYPT = 29;
 const BAD_DATA = 41;
 
-const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, certfile, withKeyPassword) => {
+const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
   const encrypted = utils.read_stdin();
   let message;
   try {
@@ -22,7 +22,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     }
   }
 
-  if (!withPassword && !withSessionKey && !certfile) {
+  if (!withPassword && !withSessionKey && !keyfiles.length) {
     throw new Error('MISSING_ARG');
   }
 
@@ -61,7 +61,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     return;
   }
 
-  let decryptionKeys = await utils.load_keys(certfile);
+  let decryptionKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
     const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
     decryptionKeys = await Promise.all(decryptionKeys.map(privateKey => openpgp.decryptKey({
@@ -75,8 +75,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   };
 
   let verificationKeys;
-  if (verifyWith) {
-    verificationKeys = await utils.load_certs(verifyWith);
+  if (verifyWith.length) {
+    verificationKeys = await utils.load_certs(...verifyWith);
     options.verificationKeys = verificationKeys;
   }
 
@@ -96,7 +96,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
           const signature = await s.signature;
           const timestamp = utils.format_date(signature.packets[0].created);
           for (const cert of verificationKeys) {
-            const signKey = await cert.getSigningKey(s.keyId, null);
+            const signKey = await cert.getSigningKey(s.keyID, null).catch(() => null);
             if (signKey) {
               verifications +=
                 timestamp

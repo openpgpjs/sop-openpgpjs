@@ -6,8 +6,8 @@ const utils = require('./utils');
 const NO_SIGNATURE = 3;
 const BAD_DATA = 41;
 
-const inlineVerify = async (certfile, verificationsOut) => {
-  const verificationKeys = await utils.load_certs(certfile);
+const inlineVerify = async (certfiles, verificationsOut) => {
+  const verificationKeys = await utils.load_certs(...certfiles);
   const data = utils.read_stdin();
   let message;
   try {
@@ -46,11 +46,11 @@ const inlineVerify = async (certfile, verificationsOut) => {
         const signature = await s.signature;
         const timestamp = utils.format_date(signature.packets[0].created);
         for (const cert of verificationKeys) {
-          const signKey = await cert.getSigningKey(s.keyId, null);
-          if (signKey) {
+          const signingKey = await cert.getSigningKey(s.keyID, null).catch(() => null);
+          if (signingKey) {
             verifications +=
               timestamp
-                + ' ' + signKey.getFingerprint().toUpperCase()
+                + ' ' + signingKey.getFingerprint().toUpperCase()
                 + ' ' + cert.getFingerprint().toUpperCase()
                 + '\n';
             break;

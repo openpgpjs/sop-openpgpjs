@@ -6,9 +6,8 @@ const utils = require('./utils');
 const NO_SIGNATURE = 3;
 const BAD_DATA = 41;
 
-const verify = async (signature, certfile) => {
-  const certs = await utils.load_certs(certfile);
-  const cert = certs[0];
+const verify = async (signature, certfiles) => {
+  const certs = await utils.load_certs(...certfiles);
   const sigBuf = fs.readFileSync(signature);
   let sig;
   try {
@@ -26,7 +25,7 @@ const verify = async (signature, certfile) => {
 
   const options = {
     message: await openpgp.createMessage({ text: data.toString('utf8') }),
-    verificationKeys: [cert],
+    verificationKeys: certs,
     signature: sig,
   };
 
@@ -44,10 +43,15 @@ const verify = async (signature, certfile) => {
         count += 1;
         const signature = await s.signature;
         const timestamp = utils.format_date(signature.packets[0].created);
-        const signKey = await cert.getSigningKey(s.keyId, null);
-        console.log(timestamp
-                    + ' ' + signKey.getFingerprint().toUpperCase()
-                    + ' ' + cert.getFingerprint().toUpperCase());
+        for (const cert of certs) {
+          const signingKey = await cert.getSigningKey(s.keyID, null).catch(() => null);
+          if (signingKey) {
+            console.log(timestamp
+                        + ' ' + signingKey.getFingerprint().toUpperCase()
+                        + ' ' + cert.getFingerprint().toUpperCase());
+            break;
+          }
+        }
       }
     }
 

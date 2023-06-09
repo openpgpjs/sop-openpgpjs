@@ -4,10 +4,10 @@ const openpgp = require('openpgp');
 const fs = require('fs');
 const utils = require('./utils');
 
-const sign = async (certfile, withKeyPassword) => {
+const sign = async (keyfiles, withKeyPassword) => {
   const data = utils.read_stdin();
 
-  let signingKeys = await utils.load_keys(certfile);
+  let signingKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
     const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
     signingKeys = await Promise.all(signingKeys.map(privateKey => openpgp.decryptKey({

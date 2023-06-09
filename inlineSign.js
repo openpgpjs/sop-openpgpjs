@@ -4,7 +4,7 @@ const openpgp = require('openpgp');
 const fs = require('fs');
 const utils = require('./utils');
 
-const inlineSign = async (certfile, withKeyPassword, as, armor) => {
+const inlineSign = async (keyfiles, withKeyPassword, as, armor) => {
   const data = utils.read_stdin();
 
   const fn = as === 'clearsigned' ? 'createCleartextMessage' : 'createMessage';
@@ -13,7 +13,7 @@ const inlineSign = async (certfile, withKeyPassword, as, armor) => {
       { binary: data } :
       { text: data.toString('utf8') }
   );
-  let signingKeys = await utils.load_keys(certfile);
+  let signingKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
     const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
     signingKeys = await Promise.all(signingKeys.map(privateKey => openpgp.decryptKey({

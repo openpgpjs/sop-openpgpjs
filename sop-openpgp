@@ -22,7 +22,7 @@ if (process.env.OPENPGPJS_CONFIG) {
 
 yargs
   .command({
-    command: 'encrypt [certfile]',
+    command: 'encrypt [certfiles..]',
     describe: 'Encrypt a Message',
     builder: {
       'with-password': {
@@ -41,11 +41,15 @@ yargs
       }
     },
     handler: async (argv) => {
-      encrypt(argv.withPassword, argv.signWith, argv.withKeyPassword, argv.certfile);
+      const signWith =
+        Array.isArray(argv.signWith) ? argv.signWith :
+        argv.signWith ? [argv.signWith] :
+        [];
+      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles);
     }
   })
   .command({
-    command: 'decrypt [certfile]',
+    command: 'decrypt [keyfiles..]',
     describe: 'Decrypt a Message',
     builder: {
       'session-key-out': {
@@ -71,11 +75,15 @@ yargs
       }
     },
     handler: async (argv) => {
-      decrypt(argv.withPassword, argv.sessionKeyOut, argv.withSessionKey, argv.verifyWith, argv.verificationsOut, argv.certfile, argv.withKeyPassword);
+      const verifyWith =
+        Array.isArray(argv.verifyWith) ? argv.verifyWith :
+        argv.verifyWith ? [argv.verifyWith] :
+        [];
+      decrypt(argv.withPassword, argv.sessionKeyOut, argv.withSessionKey, verifyWith, argv.verificationsOut, argv.keyfiles, argv.withKeyPassword);
     }
   })
   .command({
-    command: 'sign <certfile>',
+    command: 'sign <keyfiles..>',
     describe: 'Create Detached Signatures',
     builder: {
       'with-key-password': {
@@ -83,15 +91,15 @@ yargs
         type: 'string'
       }
     },
-    handler: async (argv) => { sign(argv.certfile, argv.withKeyPassword); }
+    handler: async (argv) => { sign(argv.keyfiles, argv.withKeyPassword); }
   })
   .command({
-    command: 'verify <signature> <certfile>',
+    command: 'verify <signature> <certfiles..>',
     describe: 'Verify Detached Signatures',
-    handler: async (argv) => { verify(argv.signature, argv.certfile); }
+    handler: async (argv) => { verify(argv.signature, argv.certfiles); }
   })
   .command({
-    command: 'inline-sign <certfile>',
+    command: 'inline-sign <keyfiles..>',
     describe: 'Create an Inline-Signed Message',
     builder: {
       'with-key-password': {
@@ -108,18 +116,18 @@ yargs
     },
     handler: async (argv) => {
       const armor = argv.armor != false;
-      inlineSign(argv.certfile, argv.withKeyPassword, argv.as, armor);
+      inlineSign(argv.keyfiles, argv.withKeyPassword, argv.as, armor);
     }
   })
   .command({
-    command: 'inline-verify <certfile>',
+    command: 'inline-verify <certfiles..>',
     describe: 'Verify an Inline-Signed Message',
     builder: {
       'verifications-out': {
         describe: 'save verifications to file',
       }
     },
-    handler: async (argv) => { inlineVerify(argv.certfile, argv.verificationsOut); }
+    handler: async (argv) => { inlineVerify(argv.certfiles, argv.verificationsOut); }
   })
   .command({
     command: 'inline-detach <certfile>',
