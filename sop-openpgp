@@ -147,7 +147,7 @@ yargs
     }
   })
   .command({
-    command: 'extract-cert <certfile>',
+    command: 'extract-cert',
     describe: 'Extract a Certificate from a Secret Key',
     builder: {
       armor: {
@@ -157,7 +157,7 @@ yargs
     },
     handler: async (argv) => {
       const armor = argv.armor != false;
-      extract(armor, argv.certfile);
+      extract(armor);
     }
   })
   .command({
