@@ -15,6 +15,7 @@ const generate = require('./generate');
 const extract = require('./extract');
 
 const openpgp = require(process.env.OPENPGPJS_PATH || 'openpgp');
+openpgp.config.v6Keys = true; // temporary, for crypto-refresh changes
 
 if (process.env.OPENPGPJS_CONFIG) {
   Object.assign(openpgp.config, JSON.parse(process.env.OPENPGPJS_CONFIG));
