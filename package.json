@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openpgp": "^5.11.1",
+    "openpgp": "git+https://git@github.com/openpgpjs/openpgpjs.git#v6",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
