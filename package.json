@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openpgp": "^5.5.0",
+    "openpgp": "git+https://git@github.com/openpgpjs/openpgpjs.git#crypto-refresh",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
