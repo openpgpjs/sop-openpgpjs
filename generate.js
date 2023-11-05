@@ -10,6 +10,7 @@ const generateKey = async (withKeyPassword, armor, userids) => {
     passphrase = fs.readFileSync(withKeyPassword, 'utf8').trimEnd();
   }
   const options = {
+    type: 'pqc',
     passphrase,
     userIDs: userids.map((userid) => ({
       name: userid
