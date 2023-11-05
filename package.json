@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openpgp": "git+https://git@github.com/openpgpjs/openpgpjs.git#543b914c30662c32899cfb57743d0b69853a54aa",
+    "openpgp": "git+https://git@github.com/ProtonMail/openpgpjs.git#0dc712efb62b0483439d5fb8f26eec50b9cd3798",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
