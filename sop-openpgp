@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-/*global process*/
-
 const yargs = require('yargs');
-
+const openpgp = require('./initOpenpgp');
 const encrypt = require('./encrypt');
 const decrypt = require('./decrypt');
 const sign = require('./sign');
@@ -13,12 +11,6 @@ const inlineVerify = require('./inlineVerify');
 const inlineDetach = require('./inlineDetach');
 const generate = require('./generate');
 const extract = require('./extract');
-
-const openpgp = require(process.env.OPENPGPJS_PATH || 'openpgp');
-
-if (process.env.OPENPGPJS_CONFIG) {
-  Object.assign(openpgp.config, JSON.parse(process.env.OPENPGPJS_CONFIG));
-}
 
 yargs
   .command({

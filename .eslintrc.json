@@ -1,6 +1,6 @@
 {
   "env": {
-    "browser": true,
+    "node": true,
     "commonjs": true,
     "es2021": true
   },
@@ -28,6 +28,10 @@
       "always"
     ],
     "no-var": "error",
-    "prefer-const": "error"
+    "prefer-const": "error",
+    "no-restricted-modules": ["error", {
+      "name": "openpgp",
+      "message": "Please import from './initOpenpgp.js' instead."
+    }]
   }
 }
