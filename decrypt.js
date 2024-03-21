@@ -7,7 +7,7 @@ const CANNOT_DECRYPT = 29;
 const BAD_DATA = 41;
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
-  const encrypted = utils.read_stdin();
+  const encrypted = await utils.read_stdin();
   let message;
   try {
     message = await openpgp.readMessage({ binaryMessage: encrypted });
@@ -67,9 +67,18 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       passphrase: [keyPassword, keyPassword.trimEnd()]
     })));
   }
-  const options = {
+
+  const decryptedSessionKeys = await openpgp.decryptSessionKeys({
     message,
     decryptionKeys
+  }).catch((e) => {
+    console.error(e);
+    process.exit(CANNOT_DECRYPT);
+  });
+
+  const options = {
+    message,
+    sessionKeys: decryptedSessionKeys
   };
 
   let verificationKeys;
@@ -108,26 +117,15 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       }
       fs.writeFileSync(verificationsOut, verifications);
     }
-  }).catch((e) => {
-    console.error(e);
-    return process.exit(CANNOT_DECRYPT);
-  });
 
-  if (sessionKeyOut) {
-    openpgp.decryptSessionKeys({
-      message,
-      decryptionKeys
-    }).then((decryptedSessionKeys) => {
+    if (sessionKeyOut) {
       const { algorithm, data } = decryptedSessionKeys[0];
       const sessionKeyEncoded =
         openpgp.enums.write(openpgp.enums.symmetric, algorithm) +
         ':' + Buffer.from(data).toString('hex').toUpperCase();
       fs.writeFileSync(sessionKeyOut, sessionKeyEncoded);
-    }).catch((e) => {
-      console.error(e);
-      return process.exit(CANNOT_DECRYPT);
-    });
-  }
+    }
+  });
 };
 
 module.exports = decrypt;
