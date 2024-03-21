@@ -8,7 +8,7 @@ const BAD_DATA = 41;
 
 const inlineVerify = async (certfiles, verificationsOut) => {
   const verificationKeys = await utils.load_certs(...certfiles);
-  const data = utils.read_stdin();
+  const data = await utils.read_stdin();
   let message;
   try {
     message = await openpgp.readMessage({ binaryMessage: data });

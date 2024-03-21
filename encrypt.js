@@ -6,7 +6,7 @@ const utils = require('./utils');
 const CERT_CANNOT_ENCRYPT = 17;
 
 const encrypt = async (withPassword, signWith, withKeyPassword, certfiles) => {
-  const data = utils.read_stdin();
+  const data = await utils.read_stdin();
   if (withPassword) {
     const password = fs.readFileSync(withPassword);
     const options = {

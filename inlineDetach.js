@@ -6,7 +6,7 @@ const utils = require('./utils');
 const BAD_DATA = 41;
 
 const inlineDetach = async (signaturesOut, armor) => {
-  const data = utils.read_stdin();
+  const data = await utils.read_stdin();
   let message;
   try {
     message = await openpgp.readMessage({ binaryMessage: data });

@@ -1,6 +1,7 @@
 const openpgp = require('./initOpenpgp');
 const fs = require('fs');
 const process = require('process');
+const streamConsumer = require('node:stream/consumers');
 
 const BAD_DATA = 41;
 
@@ -44,12 +45,7 @@ const load_keys = async (...filenames) => {
   }))).flat();
 };
 
-const read_stdin = () => {
-  // Using the file descriptor 0 is unreliable, because EAGAIN is
-  // not handled.  Using '/dev/stdin' works better, but will not
-  // work on non-posixly systems.
-  return fs.readFileSync('/dev/stdin');
-};
+const read_stdin = () => streamConsumer.buffer(process.stdin);
 
 // Emits a Date as specified in Section 5.9 of the SOP spec.
 const format_date = (d) => {

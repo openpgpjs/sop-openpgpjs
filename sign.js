@@ -3,7 +3,7 @@ const fs = require('fs');
 const utils = require('./utils');
 
 const sign = async (keyfiles, withKeyPassword) => {
-  const data = utils.read_stdin();
+  const data = await utils.read_stdin();
 
   let signingKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
