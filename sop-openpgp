@@ -11,12 +11,18 @@ const inlineVerify = require('./src/commands/inlineVerify');
 const inlineDetach = require('./src/commands/inlineDetach');
 const generate = require('./src/commands/generate');
 const extract = require('./src/commands/extract');
+const listProfiles = require('./src/commands/listProfiles');
+const { getProfileOptions } = require('./src/utils');
 
 yargs
   .command({
     command: 'encrypt [certfiles..]',
     describe: 'Encrypt a Message',
     builder: {
+      profile: {
+        describe: 'specify profile to use',
+        type: 'string'
+      },
       'with-password': {
         describe: 'symmetric encryption',
         type: 'string'
@@ -37,7 +43,8 @@ yargs
         Array.isArray(argv.signWith) ? argv.signWith :
         argv.signWith ? [argv.signWith] :
         [];
-      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles);
+      const profileOptions = getProfileOptions('encrypt', argv.profile);
+      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, profileOptions);
     }
   })
   .command({
@@ -156,6 +163,10 @@ yargs
     command: 'generate-key [userids..]',
     describe: 'Generate a Secret Key',
     builder: {
+      profile: {
+        describe: 'specify profile to use',
+        type: 'string'
+      },
       'with-key-password': {
         describe: 'lock key with the given password file',
         type: 'string'
@@ -172,7 +183,15 @@ yargs
     handler: async (argv) => {
       const armor = argv.armor != false;
       const userids = argv.userids || [];
-      generate(argv.withKeyPassword, armor, userids);
+      const profileOptions = getProfileOptions('generate-key', argv.profile);
+      generate(argv.withKeyPassword, armor, userids, profileOptions);
+    }
+  })
+  .command({
+    command: 'list-profiles <subcommand>',
+    describe: 'List custom profiles supported by the given subcommand',
+    handler: async (argv) => {
+      listProfiles(argv.subcommand);
     }
   })
   .command({

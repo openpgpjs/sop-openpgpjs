@@ -3,12 +3,13 @@ const fs = require('fs');
 const process = require('process');
 const { BAD_DATA } = require('../errorCodes');
 
-const generateKey = async (withKeyPassword, armor, userids) => {
+const generateKey = async (withKeyPassword, armor, userids, profileOptions) => {
   let passphrase;
   if (withKeyPassword) {
     passphrase = fs.readFileSync(withKeyPassword, 'utf8').trimEnd();
   }
   const options = {
+    ...profileOptions,
     passphrase,
     userIDs: userids.map((userid) => ({
       name: userid
