@@ -1,8 +1,8 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
 const process = require('process');
-const utils = require('./utils');
-const { CANNOT_DECRYPT, BAD_DATA } = require('./errorCodes');
+const utils = require('../utils');
+const { CANNOT_DECRYPT, BAD_DATA } = require('../errorCodes');
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
   const encrypted = await utils.read_stdin();

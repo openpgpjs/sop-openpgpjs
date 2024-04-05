@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
 const yargs = require('yargs');
-const openpgp = require('./initOpenpgp');
-const encrypt = require('./encrypt');
-const decrypt = require('./decrypt');
-const sign = require('./sign');
-const verify = require('./verify');
-const inlineSign = require('./inlineSign');
-const inlineVerify = require('./inlineVerify');
-const inlineDetach = require('./inlineDetach');
-const generate = require('./generate');
-const extract = require('./extract');
+const openpgp = require('./src/initOpenpgp');
+const encrypt = require('./src/commands/encrypt');
+const decrypt = require('./src/commands/decrypt');
+const sign = require('./src/commands/sign');
+const verify = require('./src/commands/verify');
+const inlineSign = require('./src/commands/inlineSign');
+const inlineVerify = require('./src/commands/inlineVerify');
+const inlineDetach = require('./src/commands/inlineDetach');
+const generate = require('./src/commands/generate');
+const extract = require('./src/commands/extract');
 
 yargs
   .command({

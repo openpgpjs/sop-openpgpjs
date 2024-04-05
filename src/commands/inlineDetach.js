@@ -1,8 +1,8 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
 const process = require('process');
-const utils = require('./utils');
-const { BAD_DATA } = require('./errorCodes');
+const utils = require('../utils');
+const { BAD_DATA } = require('../errorCodes');
 
 const inlineDetach = async (signaturesOut, armor) => {
   const data = await utils.read_stdin();

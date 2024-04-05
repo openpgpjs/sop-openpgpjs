@@ -1,7 +1,7 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
 const process = require('process');
-const { BAD_DATA } = require('./errorCodes');
+const { BAD_DATA } = require('../errorCodes');
 
 const generateKey = async (withKeyPassword, armor, userids) => {
   let passphrase;

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const process = require('process');
-const utils = require('./utils');
+const utils = require('../utils');
 
 const extract = async (armor) => {
   const [privateKey] = await utils.load_keys('/dev/stdin');

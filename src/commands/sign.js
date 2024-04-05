@@ -1,16 +1,10 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
-const utils = require('./utils');
+const utils = require('../utils');
 
-const inlineSign = async (keyfiles, withKeyPassword, as, armor) => {
+const sign = async (keyfiles, withKeyPassword) => {
   const data = await utils.read_stdin();
 
-  const fn = as === 'clearsigned' ? 'createCleartextMessage' : 'createMessage';
-  const message = await openpgp[fn](
-    as === 'binary' ?
-      { binary: data } :
-      { text: data.toString('utf8') }
-  );
   let signingKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
     const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
@@ -19,10 +13,12 @@ const inlineSign = async (keyfiles, withKeyPassword, as, armor) => {
       passphrase: [keyPassword, keyPassword.trimEnd()]
     })));
   }
+
   const options = {
-    message,
+    message: await openpgp.createMessage({ text: data.toString('utf8') }),
     signingKeys,
-    format: armor ? 'armored' : 'binary'
+    format: 'armored',
+    detached: true
   };
 
   openpgp.sign(options).then(async (signature) => {
@@ -30,4 +26,4 @@ const inlineSign = async (keyfiles, withKeyPassword, as, armor) => {
   });
 };
 
-module.exports = inlineSign;
+module.exports = sign;
