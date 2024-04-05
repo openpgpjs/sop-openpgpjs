@@ -2,8 +2,7 @@ const openpgp = require('./initOpenpgp');
 const fs = require('fs');
 const process = require('process');
 const utils = require('./utils');
-
-const CERT_CANNOT_ENCRYPT = 17;
+const { CERT_CANNOT_ENCRYPT } = require('./errorCodes');
 
 const encrypt = async (withPassword, signWith, withKeyPassword, certfiles) => {
   const data = await utils.read_stdin();

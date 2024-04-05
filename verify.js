@@ -2,9 +2,7 @@ const openpgp = require('./initOpenpgp');
 const fs = require('fs');
 const process = require('process');
 const utils = require('./utils');
-
-const NO_SIGNATURE = 3;
-const BAD_DATA = 41;
+const { NO_SIGNATURE, BAD_DATA } = require('./errorCodes');
 
 const verify = async (signature, certfiles) => {
   const certs = await utils.load_certs(...certfiles);

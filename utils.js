@@ -2,8 +2,8 @@ const openpgp = require('./initOpenpgp');
 const fs = require('fs');
 const process = require('process');
 const streamConsumer = require('node:stream/consumers');
+const { BAD_DATA } = require('./errorCodes');
 
-const BAD_DATA = 41;
 
 const load_certs = async (...filenames) => {
   return (await Promise.all(filenames.map(async filename => {

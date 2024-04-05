@@ -1,0 +1,6 @@
+module.exports = {
+  NO_SIGNATURE: 3,
+  CERT_CANNOT_ENCRYPT: 17,
+  CANNOT_DECRYPT: 29,
+  BAD_DATA: 41,
+};
