@@ -39,7 +39,7 @@ const encrypt = async (withPassword, signWith, withKeyPassword, certfiles) => {
   openpgp.encrypt(options).then((ciphertext) => {
     process.stdout.write(ciphertext);
   }).catch((e) => {
-    console.error(e);
+    console.error(e.message);
     return process.exit(CERT_CANNOT_ENCRYPT);
   });
 };
