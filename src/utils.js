@@ -16,7 +16,7 @@ const load_certs = async (...filenames) => {
       try {
         certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }
@@ -36,7 +36,7 @@ const load_keys = async (...filenames) => {
       try {
         keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }

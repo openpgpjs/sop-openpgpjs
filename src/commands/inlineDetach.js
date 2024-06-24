@@ -16,7 +16,7 @@ const inlineDetach = async (signaturesOut, armor) => {
       try {
         message = await openpgp.readCleartextMessage({ cleartextMessage: data.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }
@@ -39,7 +39,7 @@ const inlineDetach = async (signaturesOut, armor) => {
     }
     process.stdout.write(sig.data);
   }).catch((e) => {
-    console.error(e);
+    console.error(e.message);
     return process.exit(BAD_DATA);
   });
 };

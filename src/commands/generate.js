@@ -19,7 +19,7 @@ const generateKey = async (withKeyPassword, armor, userids, profileOptions) => {
   openpgp.generateKey(options).then(async (key) => {
     process.stdout.write(key.privateKey);
   }).catch((e) => {
-    console.error(e);
+    console.error(e.message);
     return process.exit(BAD_DATA);
   });
 };
