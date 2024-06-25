@@ -1,10 +1,8 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
 const process = require('process');
-const utils = require('./utils');
-
-const NO_SIGNATURE = 3;
-const BAD_DATA = 41;
+const utils = require('../utils');
+const { NO_SIGNATURE, BAD_DATA } = require('../errorCodes');
 
 const inlineVerify = async (certfiles, verificationsOut) => {
   const verificationKeys = await utils.load_certs(...certfiles);
@@ -19,7 +17,7 @@ const inlineVerify = async (certfiles, verificationsOut) => {
       try {
         message = await openpgp.readCleartextMessage({ cleartextMessage: data.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }
@@ -38,7 +36,7 @@ const inlineVerify = async (certfiles, verificationsOut) => {
       try {
         verified = await s.verified;
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         verified = false;
       }
       if (verified) {
@@ -66,7 +64,7 @@ const inlineVerify = async (certfiles, verificationsOut) => {
     }
     process.stdout.write(sig.data);
   }).catch((e) => {
-    console.error(e);
+    console.error(e.message);
     return process.exit(BAD_DATA);
   });
 };

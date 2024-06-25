@@ -1,10 +1,8 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
 const process = require('process');
-const utils = require('./utils');
-
-const CANNOT_DECRYPT = 29;
-const BAD_DATA = 41;
+const utils = require('../utils');
+const { CANNOT_DECRYPT, BAD_DATA } = require('../errorCodes');
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
   const encrypted = await utils.read_stdin();
@@ -15,7 +13,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     try {
       message = await openpgp.readMessage({ armoredMessage: encrypted.toString('utf8') });
     } catch (e) {
-      console.error(e);
+      console.error(e.message);
       return process.exit(BAD_DATA);
     }
   }
@@ -33,7 +31,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     openpgp.decrypt(options).then((clearText) => {
       process.stdout.write(clearText.data);
     }).catch((e) => {
-      console.error(e);
+      console.error(e.message);
       return process.exit(CANNOT_DECRYPT);
     });
     return;
@@ -53,7 +51,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     openpgp.decrypt(options).then(async (clearText) => {
       process.stdout.write(clearText.data);
     }).catch((e) => {
-      console.error(e);
+      console.error(e.message);
       return process.exit(CANNOT_DECRYPT);
     });
     return;
@@ -72,7 +70,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     message,
     decryptionKeys
   }).catch((e) => {
-    console.error(e);
+    console.error(e.message);
     process.exit(CANNOT_DECRYPT);
   });
 
@@ -96,7 +94,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
         try {
           verified = await s.verified;
         } catch (e) {
-          console.error(e);
+          console.error(e.message);
           verified = false;
         }
         if (verified) {
@@ -125,6 +123,9 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
         ':' + Buffer.from(data).toString('hex').toUpperCase();
       fs.writeFileSync(sessionKeyOut, sessionKeyEncoded);
     }
+  }).catch((e) => {
+    console.error(e.message);
+    process.exit(CANNOT_DECRYPT);
   });
 };
 

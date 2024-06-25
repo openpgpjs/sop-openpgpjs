@@ -126,3 +126,11 @@ diff <( wc -l < $ver | tr -d ' ' ) <( echo 1 )
 echo 'Test inline signing and verifying with generated key' |
 ./sop-openpgp inline-sign $key --with-key-password=test/password.txt |
 ./sop-openpgp inline-verify $key
+
+echo 'Test profiles'
+./sop-openpgp list-profiles generate-key > /dev/null
+./sop-openpgp list-profiles encrypt > /dev/null
+./sop-openpgp  generate-key --profile crypto-refresh test@test > /dev/null
+echo 'plaintext' | ./sop-openpgp encrypt --profile crypto-refresh --with-password test/password.txt > /dev/null
+
+echo 'All tests passed'
