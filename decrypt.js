@@ -125,6 +125,9 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
         ':' + Buffer.from(data).toString('hex').toUpperCase();
       fs.writeFileSync(sessionKeyOut, sessionKeyEncoded);
     }
+  }).catch((e) => {
+    console.error(e.message);
+    process.exit(CANNOT_DECRYPT);
   });
 };
 
