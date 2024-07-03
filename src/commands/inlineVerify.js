@@ -44,7 +44,7 @@ const inlineVerify = async (certfiles, verificationsOut) => {
         const signature = await s.signature;
         const timestamp = utils.format_date(signature.packets[0].created);
         for (const cert of verificationKeys) {
-          const signingKey = await cert.getSigningKey(s.keyID, null).catch(() => null);
+          const [signingKey] = await cert.getKeys(s.keyID);
           if (signingKey) {
             verifications +=
               timestamp
