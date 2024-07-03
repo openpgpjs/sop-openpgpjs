@@ -42,7 +42,7 @@ const verify = async (signature, certfiles) => {
         const signature = await s.signature;
         const timestamp = utils.format_date(signature.packets[0].created);
         for (const cert of certs) {
-          const signingKey = await cert.getSigningKey(s.keyID, null).catch(() => null);
+          const [signingKey] = await cert.getKeys(s.keyID);
           if (signingKey) {
             console.log(timestamp
                         + ' ' + signingKey.getFingerprint().toUpperCase()
