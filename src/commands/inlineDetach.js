@@ -1,9 +1,8 @@
-const openpgp = require('./initOpenpgp');
+const openpgp = require('../initOpenpgp');
 const fs = require('fs');
 const process = require('process');
-const utils = require('./utils');
-
-const BAD_DATA = 41;
+const utils = require('../utils');
+const { BAD_DATA } = require('../errorCodes');
 
 const inlineDetach = async (signaturesOut, armor) => {
   const data = await utils.read_stdin();
@@ -17,7 +16,7 @@ const inlineDetach = async (signaturesOut, armor) => {
       try {
         message = await openpgp.readCleartextMessage({ cleartextMessage: data.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }
@@ -40,7 +39,7 @@ const inlineDetach = async (signaturesOut, armor) => {
     }
     process.stdout.write(sig.data);
   }).catch((e) => {
-    console.error(e);
+    console.error(e.message);
     return process.exit(BAD_DATA);
   });
 };

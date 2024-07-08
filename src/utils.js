@@ -2,8 +2,8 @@ const openpgp = require('./initOpenpgp');
 const fs = require('fs');
 const process = require('process');
 const streamConsumer = require('node:stream/consumers');
-
-const BAD_DATA = 41;
+const { BAD_DATA, UNSUPPORTED_PROFILE } = require('./errorCodes');
+const PROFILES = require('./profiles');
 
 const load_certs = async (...filenames) => {
   return (await Promise.all(filenames.map(async filename => {
@@ -16,7 +16,7 @@ const load_certs = async (...filenames) => {
       try {
         certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }
@@ -36,7 +36,7 @@ const load_keys = async (...filenames) => {
       try {
         keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
       } catch (e) {
-        console.error(e);
+        console.error(e.message);
         return process.exit(BAD_DATA);
       }
     }
@@ -52,7 +52,20 @@ const format_date = (d) => {
   return d.toISOString().replace(/\.\d{3}/, ''); // ISO 8601 format without milliseconds.
 };
 
-module.exports.load_certs = load_certs;
-module.exports.load_keys = load_keys;
-module.exports.read_stdin = read_stdin;
-module.exports.format_date = format_date;
+const getProfileOptions = (subcommand, profileName = 'default') => {
+  const profile = PROFILES[subcommand]?.[profileName];
+  if (!profile) {
+    console.error('no supported profiles');
+    return process.exit(UNSUPPORTED_PROFILE);
+  }
+
+  return profile.options;
+};
+
+module.exports = {
+  load_certs,
+  load_keys,
+  read_stdin,
+  format_date,
+  getProfileOptions
+};
