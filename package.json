@@ -5,7 +5,8 @@
   "main": "sop-openpgp.js",
   "scripts": {
     "test": "test/run",
-    "lint": "eslint sop-openpgp *.js"
+    "lint": "eslint sop-openpgp *.js",
+    "prepare": "ncc build sop-openpgp.js -o dist --v8-cache"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "yargs": "^14.2.0"
   },
   "devDependencies": {
+    "@vercel/ncc": "^0.38.1",
     "eslint": "^8.22.0"
   }
 }
