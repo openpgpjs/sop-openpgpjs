@@ -4,9 +4,10 @@
   "description": "",
   "main": "sopenpgpjs",
   "scripts": {
+    "build": "ncc build sop-openpgp.js -o dist --v8-cache",
     "test": "test/run",
     "lint": "eslint sopenpgpjs *.js",
-    "prepare": "ncc build sop-openpgp.js -o dist --v8-cache"
+    "prepare": "npm run build"
   },
   "keywords": [],
   "author": "",
