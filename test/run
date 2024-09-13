@@ -132,5 +132,10 @@ echo 'Test profiles'
 ./sopenpgpjs list-profiles encrypt > /dev/null
 ./sopenpgpjs  generate-key --profile crypto-refresh test@test > /dev/null
 echo 'plaintext' | ./sopenpgpjs encrypt --profile crypto-refresh --with-password test/password.txt > /dev/null
+OPENPGPJS_CUSTOM_PROFILES='{ "generate-key": { "post-quantum": {
+    "description": "generate post-quantum v6 keys (relying on ML-DSA + ML-KEM)",
+    "options": { "type": "pqc", "config": { "v6Keys": true } }
+  } } }' ./sopenpgpjs list-profiles generate-key | grep post-quantum > $res
+diff $res <( echo 'post-quantum: generate post-quantum v6 keys (relying on ML-DSA + ML-KEM)' )
 
 echo 'All tests passed'

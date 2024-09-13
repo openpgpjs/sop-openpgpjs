@@ -30,3 +30,19 @@ To run `sop-openpgpjs` using an OpenPGP.js version different than the bundled on
 ```sh
 OPENPGPJS_PATH='../path-to-custom-openpgpjs-lib' ./sopenpgpjs <command>
 ```
+
+## Load custom profiles
+
+To load additional profiles (possibly relevant when testing a custom built of OpenPGP.js), you can set the `OPENPGPJS_CUSTOM_PROFILES` environment variable to point to a JSON string declaring an object of the form:
+```ts
+{
+  [targetCommandName: string]: {
+    [profileName: string]: {
+      description: string,
+      options: object
+    }
+  }
+}
+```
+Where the valid `options` depend on the target OpenPGP.js function to be run.
+See `./src/profiles.js` for examples of valid profile declarations.

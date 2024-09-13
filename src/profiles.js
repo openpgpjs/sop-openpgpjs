@@ -3,7 +3,9 @@ const DEFAULT_PROFILE = {
   options: {}
 };
 
-const PROFILES = {
+const CUSTOM_PROFILES = JSON.parse(process.env.OPENPGPJS_CUSTOM_PROFILES || '{}');
+
+const BUILTIN_PROFILES = {
   encrypt: {
     'default': DEFAULT_PROFILE,
     'crypto-refresh': {
@@ -23,5 +25,16 @@ const PROFILES = {
     }
   }
 };
+
+const mergeProfiles = (profiles1, profiles2) => {
+  const merged = {};
+  const commands = new Set(Object.keys(profiles1).concat(Object.keys(profiles2)));
+  for (const cmd of commands) {
+    merged[cmd] = { ...(profiles1?.[cmd] || {}), ...(profiles2?.[cmd] || {}) };
+  }
+  return merged;
+};
+
+const PROFILES = mergeProfiles(BUILTIN_PROFILES, CUSTOM_PROFILES);
 
 module.exports = PROFILES;
