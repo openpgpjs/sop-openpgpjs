@@ -8,18 +8,18 @@ const CUSTOM_PROFILES = JSON.parse(process.env.OPENPGPJS_CUSTOM_PROFILES || '{}'
 const BUILTIN_PROFILES = {
   encrypt: {
     'default': DEFAULT_PROFILE,
-    'crypto-refresh': {
+    'rfc9580': {
       description: 'use AEAD for password-protected messages',
       options: { config: { aeadProtect: true } }
     }
   },
   'generate-key': {
     'default': DEFAULT_PROFILE,
-    'rfc4880bis': {
+    'rfc4880': {
       description: 'generate RSA keys',
       options: { type: 'rsa' }
     },
-    'crypto-refresh': {
+    'rfc9580': {
       description: 'generate v6 keys with SEIPDv2 feature flag',
       options: { config: { v6Keys: true, aeadProtect: true } }
     }
