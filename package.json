@@ -6,7 +6,7 @@
   "scripts": {
     "build": "ncc build sop-openpgp.js -o dist --v8-cache",
     "test": "test/run",
-    "lint": "eslint sopenpgpjs *.js",
+    "lint": "eslint sop-openpgp.js *.js",
     "prepare": "npm run build"
   },
   "keywords": [],

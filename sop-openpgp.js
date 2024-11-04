@@ -41,8 +41,8 @@ yargs
     handler: async (argv) => {
       const signWith =
         Array.isArray(argv.signWith) ? argv.signWith :
-        argv.signWith ? [argv.signWith] :
-        [];
+          argv.signWith ? [argv.signWith] :
+            [];
       const profileOptions = getProfileOptions('encrypt', argv.profile);
       encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, profileOptions);
     }
@@ -76,8 +76,8 @@ yargs
     handler: async (argv) => {
       const verifyWith =
         Array.isArray(argv.verifyWith) ? argv.verifyWith :
-        argv.verifyWith ? [argv.verifyWith] :
-        [];
+          argv.verifyWith ? [argv.verifyWith] :
+            [];
       decrypt(argv.withPassword, argv.sessionKeyOut, argv.withSessionKey, verifyWith, argv.verificationsOut, argv.keyfiles, argv.withKeyPassword);
     }
   })
