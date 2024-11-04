@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openpgp": "npm:openpgp@~6.0.0-beta.3.patch.1",
+    "openpgp": "^6.0.0",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
