@@ -130,8 +130,18 @@ echo 'Test inline signing and verifying with generated key' |
 echo 'Test profiles'
 ./sopenpgpjs list-profiles generate-key > /dev/null
 ./sopenpgpjs list-profiles encrypt > /dev/null
-./sopenpgpjs  generate-key --profile crypto-refresh test@test > /dev/null
-echo 'plaintext' | ./sopenpgpjs encrypt --profile crypto-refresh --with-password test/password.txt > /dev/null
+./sopenpgpjs generate-key --profile default test@test > /dev/null
+./sopenpgpjs generate-key --profile security test@test > /dev/null
+./sopenpgpjs generate-key --profile performance test@test > /dev/null
+./sopenpgpjs generate-key --profile compatibility test@test > /dev/null
+./sopenpgpjs generate-key --profile rfc4880 test@test > /dev/null
+./sopenpgpjs generate-key --profile rfc9580 test@test > /dev/null
+echo 'plaintext' | ./sopenpgpjs encrypt --profile default --with-password test/password.txt > /dev/null
+echo 'plaintext' | ./sopenpgpjs encrypt --profile security --with-password test/password.txt > /dev/null
+echo 'plaintext' | ./sopenpgpjs encrypt --profile performance --with-password test/password.txt > /dev/null
+echo 'plaintext' | ./sopenpgpjs encrypt --profile compatibility --with-password test/password.txt > /dev/null
+echo 'plaintext' | ./sopenpgpjs encrypt --profile rfc4880 --with-password test/password.txt > /dev/null
+echo 'plaintext' | ./sopenpgpjs encrypt --profile rfc9580 --with-password test/password.txt > /dev/null
 OPENPGPJS_CUSTOM_PROFILES='{ "generate-key": { "post-quantum": {
     "description": "generate post-quantum v6 keys (relying on ML-DSA + ML-KEM)",
     "options": { "type": "pqc", "config": { "v6Keys": true } }
