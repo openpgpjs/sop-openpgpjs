@@ -12,7 +12,16 @@ const listProfiles = (subcommand) => {
     return process.exit(UNSUPPORTED_PROFILE);
   }
 
-  supportedProfiles.forEach(([name, { description }]) => process.stdout.write(`${name}: ${description}\n`));
+  supportedProfiles.forEach(([name, { description, isAlias, aliases }]) => {
+    if (!isAlias) {
+      const aliasStr = aliases
+        ? (aliases.length > 1
+          ? ` (aliases: ${aliases.join(', ')})`
+          : ` (alias: ${aliases[0]})`)
+        : '';
+      process.stdout.write(`${name}: ${description}${aliasStr}\n`);
+    }
+  });
 };
 
 module.exports = listProfiles;
