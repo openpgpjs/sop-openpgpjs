@@ -55,7 +55,7 @@ const format_date = (d) => {
 const getProfileOptions = (subcommand, profileName = 'default') => {
   const profile = PROFILES[subcommand]?.[profileName];
   if (!profile) {
-    console.error('no supported profiles');
+    console.error('unsupported profile');
     return process.exit(UNSUPPORTED_PROFILE);
   }
 
