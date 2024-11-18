@@ -35,7 +35,9 @@ yargs
         type: 'string'
       },
       as: {
-        describe: 'binary or text'
+        describe: 'the type of data to encrypt',
+        choices: ['binary', 'text'],
+        default: 'binary'
       }
     },
     handler: async (argv) => {
@@ -44,7 +46,7 @@ yargs
           argv.signWith ? [argv.signWith] :
             [];
       const profileOptions = getProfileOptions('encrypt', argv.profile);
-      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, profileOptions);
+      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, argv.as, profileOptions);
     }
   })
   .command({
