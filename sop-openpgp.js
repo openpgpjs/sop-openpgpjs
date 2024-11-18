@@ -11,6 +11,8 @@ const inlineVerify = require('./src/commands/inlineVerify');
 const inlineDetach = require('./src/commands/inlineDetach');
 const generate = require('./src/commands/generate');
 const extract = require('./src/commands/extract');
+const armor = require('./src/commands/armor');
+const dearmor = require('./src/commands/dearmor');
 const listProfiles = require('./src/commands/listProfiles');
 const { getProfileOptions } = require('./src/utils');
 
@@ -203,6 +205,16 @@ yargs
       const profileOptions = getProfileOptions('generate-key', argv.profile);
       generate(argv.withKeyPassword, armor, userids, profileOptions);
     }
+  })
+  .command({
+    command: 'armor',
+    describe: 'Convert Binary to ASCII',
+    handler: armor
+  })
+  .command({
+    command: 'dearmor',
+    describe: 'Convert ASCII to Binary',
+    handler: dearmor
   })
   .command({
     command: 'list-profiles <subcommand>',
