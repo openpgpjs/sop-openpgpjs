@@ -1,12 +1,12 @@
 const openpgp = require('../initOpenpgp');
-const fs = require('fs');
 const process = require('process');
+const utils = require('../utils');
 const { BAD_DATA } = require('../errorCodes');
 
 const generateKey = async (withKeyPassword, armor, userids, profileOptions) => {
   let passphrase;
   if (withKeyPassword) {
-    passphrase = fs.readFileSync(withKeyPassword, 'utf8').trimEnd();
+    passphrase = utils.readFile(withKeyPassword).toString('utf8').trimEnd();
   }
   const options = {
     ...profileOptions,

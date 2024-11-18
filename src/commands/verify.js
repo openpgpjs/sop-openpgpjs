@@ -1,12 +1,11 @@
 const openpgp = require('../initOpenpgp');
-const fs = require('fs');
 const process = require('process');
 const utils = require('../utils');
 const { NO_SIGNATURE, BAD_DATA } = require('../errorCodes');
 
 const verify = async (signature, certfiles) => {
-  const certs = await utils.load_certs(...certfiles);
-  const sigBuf = fs.readFileSync(signature);
+  const certs = await utils.loadCerts(...certfiles);
+  const sigBuf = utils.readFile(signature);
   let sig;
   try {
     sig = await openpgp.readSignature({ binarySignature: sigBuf });
@@ -19,7 +18,7 @@ const verify = async (signature, certfiles) => {
     }
   }
 
-  const data = await utils.read_stdin();
+  const data = await utils.readStdin();
 
   const options = {
     message: await openpgp.createMessage({ text: data.toString('utf8') }),
@@ -40,7 +39,7 @@ const verify = async (signature, certfiles) => {
       if (verified) {
         count += 1;
         const signature = await s.signature;
-        const timestamp = utils.format_date(signature.packets[0].created);
+        const timestamp = utils.formatDate(signature.packets[0].created);
         for (const cert of certs) {
           const [signingKey] = await cert.getKeys(s.keyID);
           if (signingKey) {

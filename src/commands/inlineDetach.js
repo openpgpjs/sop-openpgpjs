@@ -1,11 +1,10 @@
 const openpgp = require('../initOpenpgp');
-const fs = require('fs');
 const process = require('process');
 const utils = require('../utils');
 const { BAD_DATA } = require('../errorCodes');
 
 const inlineDetach = async (signaturesOut, armor) => {
-  const data = await utils.read_stdin();
+  const data = await utils.readStdin();
   let message;
   try {
     message = await openpgp.readMessage({ binaryMessage: data });
@@ -35,7 +34,7 @@ const inlineDetach = async (signaturesOut, armor) => {
     }
     if (signaturesOut) {
       const signatures = new openpgp.Signature(signaturePackets)[armor ? 'armor' : 'write']();
-      fs.writeFileSync(signaturesOut, signatures);
+      utils.writeFile(signaturesOut, signatures);
     }
     process.stdout.write(sig.data);
   }).catch((e) => {
