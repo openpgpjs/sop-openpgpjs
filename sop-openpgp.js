@@ -148,7 +148,7 @@ yargs
     handler: async (argv) => { inlineVerify(argv.certfiles, argv.verificationsOut); }
   })
   .command({
-    command: 'inline-detach <certfile>',
+    command: 'inline-detach',
     describe: 'Split Signatures from an Inline-Signed Message',
     builder: {
       'signatures-out': {
