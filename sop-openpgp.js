@@ -90,9 +90,14 @@ yargs
       'with-key-password': {
         describe: 'unlock key with the given password file',
         type: 'string'
-      }
+      },
+      as: {
+        describe: 'the type of data to sign',
+        choices: ['binary', 'text'],
+        default: 'binary'
+      },
     },
-    handler: async (argv) => { sign(argv.keyfiles, argv.withKeyPassword); }
+    handler: async (argv) => { sign(argv.keyfiles, argv.withKeyPassword, argv.as); }
   })
   .command({
     command: 'verify <signature> <certfiles..>',
