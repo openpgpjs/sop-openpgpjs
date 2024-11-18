@@ -38,6 +38,11 @@ yargs
         describe: 'the type of data to encrypt',
         choices: ['binary', 'text'],
         default: 'binary'
+      },
+      armor: {
+        describe: 'armor the output',
+        type: 'boolean',
+        default: true
       }
     },
     handler: async (argv) => {
@@ -46,7 +51,7 @@ yargs
           argv.signWith ? [argv.signWith] :
             [];
       const profileOptions = getProfileOptions('encrypt', argv.profile);
-      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, argv.as, profileOptions);
+      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, argv.as, argv.armor, profileOptions);
     }
   })
   .command({
@@ -96,8 +101,13 @@ yargs
         choices: ['binary', 'text'],
         default: 'binary'
       },
+      armor: {
+        describe: 'armor the output',
+        type: 'boolean',
+        default: true
+      }
     },
-    handler: async (argv) => { sign(argv.keyfiles, argv.withKeyPassword, argv.as); }
+    handler: async (argv) => { sign(argv.keyfiles, argv.withKeyPassword, argv.as, argv.armor); }
   })
   .command({
     command: 'verify <signature> <certfiles..>',
@@ -119,13 +129,11 @@ yargs
       },
       armor: {
         describe: 'armor the output',
-        type: 'boolean'
+        type: 'boolean',
+        default: true
       }
     },
-    handler: async (argv) => {
-      const armor = argv.armor != false;
-      inlineSign(argv.keyfiles, argv.withKeyPassword, argv.as, armor);
-    }
+    handler: async (argv) => { inlineSign(argv.keyfiles, argv.withKeyPassword, argv.as, argv.armor); }
   })
   .command({
     command: 'inline-verify <certfiles..>',

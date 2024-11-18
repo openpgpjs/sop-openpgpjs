@@ -3,7 +3,7 @@ const fs = require('fs');
 const utils = require('../utils');
 const { KEY_CANNOT_SIGN } = require('../errorCodes');
 
-const sign = async (keyfiles, withKeyPassword, as) => {
+const sign = async (keyfiles, withKeyPassword, as, armor) => {
   const data = await utils.read_stdin();
   const message = await openpgp.createMessage(
     as === 'binary' ?
@@ -24,7 +24,8 @@ const sign = async (keyfiles, withKeyPassword, as) => {
     message,
     signingKeys,
     format: 'armored',
-    detached: true
+    detached: true,
+    format: armor ? 'armored' : 'binary'
   };
 
   openpgp.sign(options).then(async (signature) => {
