@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const yargs = require('yargs');
-const openpgp = require('./src/initOpenpgp');
 const encrypt = require('./src/commands/encrypt');
 const decrypt = require('./src/commands/decrypt');
 const sign = require('./src/commands/sign');
@@ -14,6 +13,7 @@ const extract = require('./src/commands/extract');
 const armor = require('./src/commands/armor');
 const dearmor = require('./src/commands/dearmor');
 const listProfiles = require('./src/commands/listProfiles');
+const version = require('./src/commands/version');
 const { getProfileOptions } = require('./src/utils');
 
 yargs
@@ -234,20 +234,17 @@ yargs
       extended: {
         describe: 'display extended version information',
         type: 'boolean'
+      },
+      'sop-spec': {
+        describe: 'display supported sop specification version',
+        type: 'boolean'
+      },
+      sopv: {
+        describe: 'display supported sopv specification version',
+        type: 'boolean'
       }
     },
-    handler: (argv) => {
-      if (!argv.backend || argv.extended) {
-        const package = require('./package.json');
-        console.log(package.name + ' ' + package.version);
-      }
-      if (argv.backend || argv.extended) {
-        console.log(openpgp.config.versionString);
-      }
-      if (argv.extended) {
-        console.log('Running on Node.js ' + process.version);
-      }
-    }
+    handler: version
   })
   .version(false) // Disable --version option as we have our own version command.
   .help()
