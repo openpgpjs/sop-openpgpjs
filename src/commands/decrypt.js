@@ -26,7 +26,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     const password = fs.readFileSync(withPassword);
     const options = {
       message: message,
-      passwords: password
+      passwords: password,
+      format: 'binary'
     };
     openpgp.decrypt(options).then((clearText) => {
       process.stdout.write(clearText.data);
@@ -46,7 +47,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     };
     const options = {
       message: message,
-      sessionKeys: sessionKey
+      sessionKeys: sessionKey,
+      format: 'binary'
     };
     openpgp.decrypt(options).then(async (clearText) => {
       process.stdout.write(clearText.data);
@@ -81,7 +83,8 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   const options = {
     message,
-    sessionKeys: decryptedSessionKeys
+    sessionKeys: decryptedSessionKeys,
+    format: 'binary'
   };
 
   let verificationKeys;
