@@ -108,7 +108,9 @@ yargs
         type: 'string'
       },
       as: {
-        describe: 'binary or text'
+        describe: 'the type of data to sign',
+        choices: ['binary', 'text', 'clearsigned'],
+        default: 'binary'
       },
       armor: {
         describe: 'armor the output',
