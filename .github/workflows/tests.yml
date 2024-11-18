@@ -14,3 +14,5 @@ jobs:
     - uses: actions/setup-node@v4
     - run: npm ci
     - run: npm test
+    - run: git clone https://gitlab.com/dkg/openpgp-stateless-cli.git
+    - run: openpgp-stateless-cli/test/evaluate ./sopenpgpjs
