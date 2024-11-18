@@ -66,7 +66,7 @@ echo 'Test inline verifying message signature'
 diff $res test/message.txt
 
 echo 'Test inline detaching message signature'
-./sopenpgpjs inline-detach test/alice.asc < test/signed-text-message.txt > $res
+./sopenpgpjs inline-detach < test/signed-text-message.txt > $res
 diff $res test/message.txt
 
 echo 'Test inline signing binary'
@@ -80,7 +80,7 @@ echo 'Test inline verifying binary message signature'
 diff $res test/message.txt
 
 echo 'Test inline detaching binary message signature'
-./sopenpgpjs inline-detach test/alice.asc < test/signed-binary-message.txt > $res
+./sopenpgpjs inline-detach < test/signed-binary-message.txt > $res
 diff $res test/message.txt
 
 echo 'Test inline signing clearsigned'
@@ -94,7 +94,7 @@ echo 'Test inline verifying clearsigned message signature'
 diff $res test/message.txt
 
 echo 'Test inline detaching clearsigned message signature'
-./sopenpgpjs inline-detach test/alice.asc < test/clearsigned-message.txt > $res
+./sopenpgpjs inline-detach < test/clearsigned-message.txt > $res
 diff $res test/message.txt
 
 echo 'Test generating key'
