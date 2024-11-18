@@ -1,11 +1,10 @@
 const openpgp = require('../initOpenpgp');
-const fs = require('fs');
 const process = require('process');
 const utils = require('../utils');
 const { CANNOT_DECRYPT, BAD_DATA, KEY_IS_PROTECTED } = require('../errorCodes');
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
-  const encrypted = await utils.read_stdin();
+  const encrypted = await utils.readStdin();
   let message;
   try {
     message = await openpgp.readMessage({ binaryMessage: encrypted });
@@ -23,7 +22,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   if (withPassword) {
-    const password = fs.readFileSync(withPassword);
+    const password = utils.readFile(withPassword);
     const options = {
       message: message,
       passwords: password,
@@ -39,7 +38,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
   }
 
   if (withSessionKey) {
-    const sessionKeyEncoded = fs.readFileSync(withSessionKey, 'utf8');
+    const sessionKeyEncoded = utils.readFile(withSessionKey).toString('utf8');
     const [algo, data] = sessionKeyEncoded.split(':');
     const sessionKey = {
       data: Buffer.from(data, 'hex'),
@@ -59,9 +58,9 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     return;
   }
 
-  let decryptionKeys = await utils.load_keys(...keyfiles);
+  let decryptionKeys = await utils.loadKeys(...keyfiles);
   if (withKeyPassword) {
-    const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
+    const keyPassword = utils.readFile(withKeyPassword).toString('utf8');
     decryptionKeys = await Promise.all(decryptionKeys.map(privateKey => openpgp.decryptKey({
       privateKey,
       passphrase: [keyPassword, keyPassword.trimEnd()]
@@ -89,7 +88,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   let verificationKeys;
   if (verifyWith.length) {
-    verificationKeys = await utils.load_certs(...verifyWith);
+    verificationKeys = await utils.loadCerts(...verifyWith);
     options.verificationKeys = verificationKeys;
   }
 
@@ -107,7 +106,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
         }
         if (verified) {
           const signature = await s.signature;
-          const timestamp = utils.format_date(signature.packets[0].created);
+          const timestamp = utils.formatDate(signature.packets[0].created);
           for (const cert of verificationKeys) {
             const signKey = await cert.getSigningKey(s.keyID, null).catch(() => null);
             if (signKey) {
@@ -121,7 +120,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
           }
         }
       }
-      fs.writeFileSync(verificationsOut, verifications);
+      utils.writeFile(verificationsOut, verifications);
     }
 
     if (sessionKeyOut) {
@@ -129,7 +128,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       const sessionKeyEncoded =
         openpgp.enums.write(openpgp.enums.symmetric, algorithm) +
         ':' + Buffer.from(data).toString('hex').toUpperCase();
-      fs.writeFileSync(sessionKeyOut, sessionKeyEncoded);
+      utils.writeFile(sessionKeyOut, sessionKeyEncoded);
     }
   }).catch((e) => {
     console.error(e.message);

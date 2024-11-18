@@ -1,18 +1,17 @@
 const openpgp = require('../initOpenpgp');
-const fs = require('fs');
 const process = require('process');
 const utils = require('../utils');
 const { CERT_CANNOT_ENCRYPT } = require('../errorCodes');
 
 const encrypt = async (withPassword, signWith, withKeyPassword, certfiles, as, armor, profileOptions) => {
-  const data = await utils.read_stdin();
+  const data = await utils.readStdin();
   const message = await openpgp.createMessage(
     as === 'binary' ?
       { binary: data } :
       { text: data.toString('utf8') }
   );
   if (withPassword) {
-    const password = fs.readFileSync(withPassword);
+    const password = utils.readFile(withPassword);
     const options = {
       ...profileOptions,
       message,
@@ -28,13 +27,13 @@ const encrypt = async (withPassword, signWith, withKeyPassword, certfiles, as, a
   const options = {
     ...profileOptions,
     message,
-    encryptionKeys: await utils.load_certs(...certfiles),
+    encryptionKeys: await utils.loadCerts(...certfiles),
     format: armor ? 'armored' : 'binary'
   };
   if (signWith.length) {
-    let signingKeys = await utils.load_keys(...signWith);
+    let signingKeys = await utils.loadKeys(...signWith);
     if (withKeyPassword) {
-      const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
+      const keyPassword = utils.readFile(withKeyPassword).toString('utf8');
       signingKeys = await Promise.all(signingKeys.map(privateKey => openpgp.decryptKey({
         privateKey,
         passphrase: [keyPassword, keyPassword.trimEnd()]

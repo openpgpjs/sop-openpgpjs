@@ -5,9 +5,28 @@ const streamConsumer = require('node:stream/consumers');
 const { BAD_DATA, UNSUPPORTED_PROFILE } = require('./errorCodes');
 const PROFILES = require('./profiles');
 
-const load_certs = async (...filenames) => {
+const readStdin = () => streamConsumer.buffer(process.stdin);
+
+const readFile = (filename) => {
+  if (filename.startsWith('@ENV:')) {
+    return Buffer.from(process.env[filename.substr(5)]);
+  }
+  if (filename.startsWith('@FD:')) {
+    return fs.readFileSync(parseInt(filename.substr(4)));
+  }
+  return fs.readFileSync(filename);
+}
+
+const writeFile = (filename, contents) => {
+  if (filename.startsWith('@FD:')) {
+    return fs.writeFileSync(parseInt(filename.substr(4)), contents);
+  }
+  return fs.writeFileSync(filename, contents);
+}
+
+const loadCerts = async (...filenames) => {
   return (await Promise.all(filenames.map(async filename => {
-    const buf = fs.readFileSync(filename);
+    const buf = readFile(filename);
 
     let certs;
     try {
@@ -25,9 +44,9 @@ const load_certs = async (...filenames) => {
   }))).flat();
 };
 
-const load_keys = async (...filenames) => {
+const loadKeys = async (...filenames) => {
   return (await Promise.all(filenames.map(async filename => {
-    const buf = fs.readFileSync(filename);
+    const buf = readFile(filename);
 
     let keys;
     try {
@@ -45,10 +64,8 @@ const load_keys = async (...filenames) => {
   }))).flat();
 };
 
-const read_stdin = () => streamConsumer.buffer(process.stdin);
-
 // Emits a Date as specified in Section 5.9 of the SOP spec.
-const format_date = (d) => {
+const formatDate = (d) => {
   return d.toISOString().replace(/\.\d{3}/, ''); // ISO 8601 format without milliseconds.
 };
 
@@ -63,9 +80,11 @@ const getProfileOptions = (subcommand, profileName = 'default') => {
 };
 
 module.exports = {
-  load_certs,
-  load_keys,
-  read_stdin,
-  format_date,
+  readStdin,
+  readFile,
+  writeFile,
+  loadCerts,
+  loadKeys,
+  formatDate,
   getProfileOptions
 };

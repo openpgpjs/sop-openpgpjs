@@ -12,7 +12,7 @@ for (const maybePacket of Object.values(openpgp)) {
 }
 
 const armor = async () => {
-  let data = await utils.read_stdin();
+  let data = await utils.readStdin();
   try {
     // If the data is already armored, unarmor it first.
     ({ data } = await openpgp.unarmor(data));

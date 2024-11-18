@@ -3,7 +3,7 @@ const process = require('process');
 const utils = require('../utils');
 
 const dearmor = async () => {
-  const data = await utils.read_stdin();
+  const data = await utils.readStdin();
 
   try {
     const { data: unarmored } = await openpgp.unarmor(data);
