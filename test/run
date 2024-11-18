@@ -34,7 +34,7 @@ echo 'Test decrypting with session key'
 diff $res test/message.txt
 ./sopenpgpjs decrypt --with-session-key=$sk < test/encrypted-message.asc > $res
 diff $res test/message.txt
-./sopenpgpjs decrypt --with-session-key=<( echo "9:15DC6A120BAD8E9C0847A318BF41BEF60A970B8716D86BADC8D3D31BF14C9728" ) < test/encrypted-message.asc > $res
+./sopenpgpjs decrypt --with-session-key=<( echo "9:073F2E2D32DD625E0B6690AC36019A8F8FF0F458E28B57244517888719ECFD56" ) < test/encrypted-message.asc > $res
 diff $res test/message.txt
 
 echo 'Test encrypting+signing and decrypting+verifying'
