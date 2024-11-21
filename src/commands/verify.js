@@ -21,7 +21,7 @@ const verify = async (signature, certfiles) => {
   const data = await utils.readStdin();
 
   const options = {
-    message: await openpgp.createMessage({ text: data.toString('utf8') }),
+    message: await openpgp.createMessage({ binary: data }),
     verificationKeys: certs,
     signature: sig,
   };
