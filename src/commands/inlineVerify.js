@@ -24,7 +24,10 @@ const inlineVerify = async (certfiles, verificationsOut) => {
 
   const options = {
     message,
-    verificationKeys
+    verificationKeys,
+    format: message instanceof openpgp.CleartextMessage ?
+      'text' :
+      'binary'
   };
 
   openpgp.verify(options).then(async (sig) => {
