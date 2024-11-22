@@ -27,34 +27,11 @@ const verify = async (signature, certfiles) => {
   };
 
   openpgp.verify(options).then(async (sig) => {
-    let count = 0;
-    for (const s of sig.signatures) {
-      let verified;
-      try {
-        verified = await s.verified;
-      } catch (e) {
-        console.error(e.message);
-        verified = false;
-      }
-      if (verified) {
-        count += 1;
-        const signature = await s.signature;
-        const timestamp = utils.formatDate(signature.packets[0].created);
-        for (const cert of certs) {
-          const [signingKey] = await cert.getKeys(s.keyID);
-          if (signingKey) {
-            console.log(timestamp
-                        + ' ' + signingKey.getFingerprint().toUpperCase()
-                        + ' ' + cert.getFingerprint().toUpperCase());
-            break;
-          }
-        }
-      }
-    }
-
-    if (count == 0) {
+    const verifications = await utils.getVerifications(sig.signatures, certs);
+    if (verifications === '') {
       return process.exit(NO_SIGNATURE);
     }
+    process.stdout.write(verifications);
   }).catch((e) => {
     console.error(e.message);
     return process.exit(BAD_DATA);

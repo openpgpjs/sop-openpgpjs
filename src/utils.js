@@ -79,6 +79,37 @@ const getProfileOptions = (subcommand, profileName = 'default') => {
   return profile.options;
 };
 
+const getVerifications = async (signatures, verificationKeys) => {
+  let verifications = '';
+  for (const s of signatures) {
+    let verified;
+    try {
+      verified = await s.verified;
+    } catch (e) {
+      console.error(e.message);
+      verified = false;
+    }
+    if (verified) {
+      const signature = await s.signature;
+      const timestamp = formatDate(signature.packets[0].created);
+      const mode = openpgp.enums.read(openpgp.enums.signature, signature.packets[0].signatureType);
+      for (const cert of verificationKeys) {
+        const [signingKey] = await cert.getKeys(s.keyID);
+        if (signingKey) {
+          verifications +=
+            timestamp
+              + ' ' + signingKey.getFingerprint().toUpperCase()
+              + ' ' + cert.getFingerprint().toUpperCase()
+              + ' mode:' + mode
+              + '\n';
+          break;
+        }
+      }
+    }
+  }
+  return verifications;
+}
+
 module.exports = {
   readStdin,
   readFile,
@@ -86,5 +117,6 @@ module.exports = {
   loadCerts,
   loadKeys,
   formatDate,
-  getProfileOptions
+  getProfileOptions,
+  getVerifications
 };
