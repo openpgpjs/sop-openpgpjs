@@ -53,7 +53,7 @@ echo 'Test encrypting+signing and decrypting+verifying'
 
 echo 'Test detached verifying message signature'
 ./sopenpgpjs verify test/detached-sig.txt test/alice.asc < test/message.txt > $ver
-diff $ver <( echo "2020-03-30T12:09:26Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:text" )
+diff $ver <( echo '2020-03-30T12:09:26Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:text {"signers":["test/alice.asc"]}' )
 
 echo 'Test inline signing and verifying'
 cat test/message.txt |
@@ -65,7 +65,7 @@ diff <( wc -l < $ver | tr -d ' ' ) <( echo 1 )
 echo 'Test inline verifying message signature'
 ./sopenpgpjs inline-verify --verifications-out=$ver test/alice.asc < test/signed-text-message.txt > $res
 diff $res test/message.txt
-diff $ver <( echo "2024-11-22T09:17:14Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:binary" )
+diff $ver <( echo '2024-11-22T09:17:14Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:binary {"signers":["test/alice.asc"]}' )
 
 echo 'Test inline detaching message signature'
 ./sopenpgpjs inline-detach < test/signed-text-message.txt > $res
@@ -81,7 +81,7 @@ diff <( wc -l < $ver | tr -d ' ' ) <( echo 1 )
 echo 'Test inline verifying binary message signature'
 ./sopenpgpjs inline-verify --verifications-out=$ver test/alice.asc < test/signed-binary-message.txt > $res
 diff $res test/message.txt
-diff $ver <( echo "2022-08-23T14:46:04Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:binary" )
+diff $ver <( echo '2022-08-23T14:46:04Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:binary {"signers":["test/alice.asc"]}' )
 
 echo 'Test inline detaching binary message signature'
 ./sopenpgpjs inline-detach < test/signed-binary-message.txt > $res
@@ -97,7 +97,7 @@ diff <( wc -l < $ver | tr -d ' ' ) <( echo 1 )
 echo 'Test inline verifying clearsigned message signature'
 ./sopenpgpjs inline-verify --verifications-out=$ver test/alice.asc < test/clearsigned-message.txt > $res
 diff $res test/message.txt
-diff $ver <( echo "2022-08-23T14:53:02Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:text" )
+diff $ver <( echo '2022-08-23T14:53:02Z 2110263205FB0EBCCD6CB81F62084ACFC736D34A 2110263205FB0EBCCD6CB81F62084ACFC736D34A mode:text {"signers":["test/alice.asc"]}' )
 
 echo 'Test inline detaching clearsigned message signature'
 ./sopenpgpjs inline-detach < test/clearsigned-message.txt > $res

@@ -39,6 +39,9 @@ const loadCerts = async (...filenames) => {
         return process.exit(BAD_DATA);
       }
     }
+    certs.forEach(cert => {
+      cert.filename = filename;
+    });
 
     return certs;
   }))).flat();
@@ -93,18 +96,23 @@ const getVerifications = async (signatures, verificationKeys) => {
       const signature = await s.signature;
       const timestamp = formatDate(signature.packets[0].created);
       const mode = openpgp.enums.read(openpgp.enums.signature, signature.packets[0].signatureType);
+      const signers = [];
+      let signingKeyFp, signingCertFp;
       for (const cert of verificationKeys) {
         const [signingKey] = await cert.getKeys(s.keyID);
         if (signingKey) {
-          verifications +=
-            timestamp
-              + ' ' + signingKey.getFingerprint().toUpperCase()
-              + ' ' + cert.getFingerprint().toUpperCase()
-              + ' mode:' + mode
-              + '\n';
-          break;
+          signers.push(cert.filename);
+          signingKeyFp = signingKey.getFingerprint().toUpperCase();
+          signingCertFp = cert.getFingerprint().toUpperCase();
         }
       }
+      verifications +=
+        timestamp
+          + ' ' + signingKeyFp
+          + ' ' + signingCertFp
+          + ' mode:' + mode
+          + ' ' + JSON.stringify({ signers })
+          + '\n';
     }
   }
   return verifications;
