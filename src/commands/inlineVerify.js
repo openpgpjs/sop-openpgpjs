@@ -31,34 +31,8 @@ const inlineVerify = async (certfiles, verificationsOut) => {
   };
 
   openpgp.verify(options).then(async (sig) => {
-    let count = 0;
-    let verifications = '';
-    for (const s of sig.signatures) {
-      let verified;
-      try {
-        verified = await s.verified;
-      } catch (e) {
-        console.error(e.message);
-        verified = false;
-      }
-      if (verified) {
-        count++;
-        const signature = await s.signature;
-        const timestamp = utils.formatDate(signature.packets[0].created);
-        for (const cert of verificationKeys) {
-          const [signingKey] = await cert.getKeys(s.keyID);
-          if (signingKey) {
-            verifications +=
-              timestamp
-                + ' ' + signingKey.getFingerprint().toUpperCase()
-                + ' ' + cert.getFingerprint().toUpperCase()
-                + '\n';
-            break;
-          }
-        }
-      }
-    }
-    if (count == 0) {
+    const verifications = await utils.getVerifications(sig.signatures, verificationKeys);
+    if (verifications === '') {
       return process.exit(NO_SIGNATURE);
     }
     if (verificationsOut) {
