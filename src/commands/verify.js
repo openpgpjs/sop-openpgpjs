@@ -13,7 +13,7 @@ const verify = async (signature, certfiles) => {
     try {
       sig = await openpgp.readSignature({ armoredSignature: sigBuf.toString('utf8') });
     } catch (e) {
-      console.error(e.message);
+      utils.logError(e);
       return process.exit(BAD_DATA);
     }
   }
@@ -33,7 +33,7 @@ const verify = async (signature, certfiles) => {
     }
     process.stdout.write(verifications);
   }).catch((e) => {
-    console.error(e.message);
+    utils.logError(e);
     return process.exit(BAD_DATA);
   });
 };

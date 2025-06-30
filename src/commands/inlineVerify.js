@@ -16,7 +16,7 @@ const inlineVerify = async (certfiles, verificationsOut) => {
       try {
         message = await openpgp.readCleartextMessage({ cleartextMessage: data.toString('utf8') });
       } catch (e) {
-        console.error(e.message);
+        utils.logError(e);
         return process.exit(BAD_DATA);
       }
     }
@@ -40,7 +40,7 @@ const inlineVerify = async (certfiles, verificationsOut) => {
     }
     process.stdout.write(sig.data);
   }).catch((e) => {
-    console.error(e.message);
+    utils.logError(e);
     return process.exit(BAD_DATA);
   });
 };

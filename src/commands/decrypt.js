@@ -12,7 +12,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     try {
       message = await openpgp.readMessage({ armoredMessage: encrypted.toString('utf8') });
     } catch (e) {
-      console.error(e.message);
+      utils.logError(e);
       return process.exit(BAD_DATA);
     }
   }
@@ -31,7 +31,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     openpgp.decrypt(options).then((clearText) => {
       process.stdout.write(clearText.data);
     }).catch((e) => {
-      console.error(e.message);
+      utils.logError(e);
       return process.exit(CANNOT_DECRYPT);
     });
     return;
@@ -52,7 +52,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     openpgp.decrypt(options).then(async (clearText) => {
       process.stdout.write(clearText.data);
     }).catch((e) => {
-      console.error(e.message);
+      utils.logError(e);
       return process.exit(CANNOT_DECRYPT);
     });
     return;
@@ -67,7 +67,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     }))).catch((e) => {
       // TODO: Only error on key decryption failure if we can't decrypt
       // the message with another key (or password or session key).
-      console.error(e.message);
+      utils.logError(e);
       process.exit(KEY_IS_PROTECTED);
     });
   }
@@ -76,7 +76,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     message,
     decryptionKeys
   }).catch((e) => {
-    console.error(e.message);
+    utils.logError(e);
     process.exit(CANNOT_DECRYPT);
   });
 
@@ -107,7 +107,7 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
       utils.writeFile(sessionKeyOut, sessionKeyEncoded);
     }
   }).catch((e) => {
-    console.error(e.message);
+    utils.logError(e);
     process.exit(CANNOT_DECRYPT);
   });
 };

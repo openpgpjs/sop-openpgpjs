@@ -30,7 +30,7 @@ const sign = async (keyfiles, withKeyPassword, as, armor) => {
   openpgp.sign(options).then(async (signature) => {
     process.stdout.write(signature);
   }).catch((e) => {
-    console.error(e.message);
+    utils.logError(e);
     return process.exit(KEY_CANNOT_SIGN);
   });
 };

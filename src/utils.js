@@ -35,7 +35,7 @@ const loadCerts = async (...filenames) => {
       try {
         certs = await openpgp.readKeys({ armoredKeys: buf.toString('utf8') });
       } catch (e) {
-        console.error(e.message);
+        logError(e);
         return process.exit(BAD_DATA);
       }
     }
@@ -58,7 +58,7 @@ const loadKeys = async (...filenames) => {
       try {
         keys = await openpgp.readPrivateKeys({ armoredKeys: buf.toString('utf8') });
       } catch (e) {
-        console.error(e.message);
+        logError(e);
         return process.exit(BAD_DATA);
       }
     }
@@ -89,7 +89,7 @@ const getVerifications = async (signatures, verificationKeys) => {
     try {
       verified = await s.verified;
     } catch (e) {
-      console.error(e.message);
+      logError(e);
       verified = false;
     }
     if (verified) {
@@ -116,7 +116,15 @@ const getVerifications = async (signatures, verificationKeys) => {
     }
   }
   return verifications;
-}
+};
+
+const logError = function(e) {
+  if (globalThis.argv.debug) {
+    console.error(e);
+  } else {
+    console.error(e.message);
+  }
+};
 
 module.exports = {
   readStdin,
@@ -126,5 +134,6 @@ module.exports = {
   loadKeys,
   formatDate,
   getProfileOptions,
-  getVerifications
+  getVerifications,
+  logError
 };

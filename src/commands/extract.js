@@ -13,7 +13,7 @@ const extract = async (armor) => {
     }
     process.stdout.write(pubKey.armor());
   } catch (e) {
-    console.error(e.message);
+    utils.logError(e);
     return process.exit(BAD_DATA);
   }
 };

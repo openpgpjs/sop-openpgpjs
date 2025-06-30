@@ -16,7 +16,7 @@ const listProfiles = require('./src/commands/listProfiles');
 const version = require('./src/commands/version');
 const { getProfileOptions } = require('./src/utils');
 
-yargs
+globalThis.argv = yargs
   .command({
     command: 'encrypt [certfiles..]',
     describe: 'Encrypt a Message',
@@ -249,6 +249,10 @@ yargs
   .version(false) // Disable --version option as we have our own version command.
   .help()
   .alias('help', 'h')
+  .option('debug', {
+    describe: 'Enable more detailed error reporting',
+    type: 'boolean'
+  })
   .demandCommand(1)
   .strict()
   .argv;
