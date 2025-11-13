@@ -2,7 +2,7 @@ const openpgp = require('./initOpenpgp');
 const fs = require('fs');
 const process = require('process');
 const streamConsumer = require('node:stream/consumers');
-const { BAD_DATA, UNSUPPORTED_PROFILE } = require('./errorCodes');
+const { BAD_DATA, UNSUPPORTED_PROFILE, KEY_IS_PROTECTED } = require('./errorCodes');
 const PROFILES = require('./profiles');
 
 const readStdin = () => streamConsumer.buffer(process.stdin);
@@ -65,6 +65,24 @@ const loadKeys = async (...filenames) => {
 
     return keys;
   }))).flat();
+};
+
+const decryptKeys = async (keys, withKeyPassword) => {
+  const keyPassword = readFile(withKeyPassword).toString('utf8');
+  try {
+    return await Promise.all(keys.map(async privateKey => {
+      if (privateKey.isDecrypted()) {
+        return privateKey;
+      }
+      return await openpgp.decryptKey({
+        privateKey,
+        passphrase: [keyPassword, keyPassword.trimEnd()]
+      });
+    }));
+  } catch (e) {
+    logError(e);
+    process.exit(KEY_IS_PROTECTED);
+  }
 };
 
 // Emits a Date as specified in Section 5.9 of the SOP spec.
@@ -132,6 +150,7 @@ module.exports = {
   writeFile,
   loadCerts,
   loadKeys,
+  decryptKeys,
   formatDate,
   getProfileOptions,
   getVerifications,

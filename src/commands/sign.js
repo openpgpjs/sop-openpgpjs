@@ -1,6 +1,6 @@
 const openpgp = require('../initOpenpgp');
 const utils = require('../utils');
-const { KEY_CANNOT_SIGN, KEY_IS_PROTECTED } = require('../errorCodes');
+const { KEY_CANNOT_SIGN } = require('../errorCodes');
 
 const sign = async (keyfiles, withKeyPassword, as, armor) => {
   const data = await utils.readStdin();
@@ -12,14 +12,7 @@ const sign = async (keyfiles, withKeyPassword, as, armor) => {
 
   let signingKeys = await utils.loadKeys(...keyfiles);
   if (withKeyPassword) {
-    const keyPassword = utils.readFile(withKeyPassword).toString('utf8');
-    signingKeys = await Promise.all(signingKeys.map(privateKey => openpgp.decryptKey({
-      privateKey,
-      passphrase: [keyPassword, keyPassword.trimEnd()]
-    }))).catch((e) => {
-      utils.logError(e);
-      process.exit(KEY_IS_PROTECTED);
-    });
+    signingKeys = await utils.decryptKeys(signingKeys, withKeyPassword);
   }
 
   const options = {

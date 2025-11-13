@@ -1,7 +1,7 @@
 const openpgp = require('../initOpenpgp');
 const process = require('process');
 const utils = require('../utils');
-const { CANNOT_DECRYPT, BAD_DATA, KEY_IS_PROTECTED } = require('../errorCodes');
+const { CANNOT_DECRYPT, BAD_DATA } = require('../errorCodes');
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
   const encrypted = await utils.readStdin();
@@ -60,16 +60,9 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   let decryptionKeys = await utils.loadKeys(...keyfiles);
   if (withKeyPassword) {
-    const keyPassword = utils.readFile(withKeyPassword).toString('utf8');
-    decryptionKeys = await Promise.all(decryptionKeys.map(privateKey => openpgp.decryptKey({
-      privateKey,
-      passphrase: [keyPassword, keyPassword.trimEnd()]
-    }))).catch((e) => {
-      // TODO: Only error on key decryption failure if we can't decrypt
-      // the message with another key (or password or session key).
-      utils.logError(e);
-      process.exit(KEY_IS_PROTECTED);
-    });
+    // TODO: Only error on key decryption failure if we can't decrypt
+    // the message with another key (or password or session key).
+    decryptionKeys = await utils.decryptKeys(decryptionKeys, withKeyPassword);
   }
 
   const decryptedSessionKeys = await openpgp.decryptSessionKeys({
