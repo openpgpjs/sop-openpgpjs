@@ -5,7 +5,6 @@ const utils = require('./utils');
 
 const CANNOT_DECRYPT = 29;
 const BAD_DATA = 41;
-const KEY_IS_PROTECTED = 67;
 
 const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
   const encrypted = await utils.read_stdin();
@@ -62,16 +61,9 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
 
   let decryptionKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
-    const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
-    decryptionKeys = await Promise.all(decryptionKeys.map(privateKey => openpgp.decryptKey({
-      privateKey,
-      passphrase: [keyPassword, keyPassword.trimEnd()]
-    }))).catch((e) => {
-      // TODO: Only error on key decryption failure if we can't decrypt
-      // the message with another key (or password or session key).
-      console.error(e.message);
-      process.exit(KEY_IS_PROTECTED);
-    });
+    // TODO: Only error on key decryption failure if we can't decrypt
+    // the message with another key (or password or session key).
+    decryptionKeys = await utils.decrypt_keys(decryptionKeys, withKeyPassword);
   }
 
   const decryptedSessionKeys = await openpgp.decryptSessionKeys({

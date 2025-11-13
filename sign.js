@@ -9,11 +9,7 @@ const sign = async (keyfiles, withKeyPassword) => {
 
   let signingKeys = await utils.load_keys(...keyfiles);
   if (withKeyPassword) {
-    const keyPassword = fs.readFileSync(withKeyPassword, 'utf8');
-    signingKeys = await Promise.all(signingKeys.map(privateKey => openpgp.decryptKey({
-      privateKey,
-      passphrase: [keyPassword, keyPassword.trimEnd()]
-    })));
+    signingKeys = await utils.decrypt_keys(signingKeys, withKeyPassword);
   }
 
   const options = {
