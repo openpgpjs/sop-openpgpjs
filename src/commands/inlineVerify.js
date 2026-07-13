@@ -3,8 +3,12 @@ const process = require('process');
 const utils = require('../utils');
 const { NO_SIGNATURE, BAD_DATA } = require('../errorCodes');
 
-const inlineVerify = async (certfiles, verificationsOut) => {
-  const verificationKeys = await utils.loadCerts(...certfiles);
+const inlineVerify = async (certfiles, withKeyPassword, verificationsOut) => {
+  let verificationKeys = await utils.loadCerts(...certfiles);
+  if (withKeyPassword) {
+    verificationKeys = await utils.decryptKeys(verificationKeys, withKeyPassword, true);
+  }
+
   const data = await utils.readStdin();
   let message;
   try {

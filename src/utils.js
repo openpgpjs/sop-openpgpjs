@@ -67,10 +67,13 @@ const loadKeys = async (...filenames) => {
   }))).flat();
 };
 
-const decryptKeys = async (keys, withKeyPassword) => {
+const decryptKeys = async (keys, withKeyPassword, psksOnly = false) => {
   const keyPassword = readFile(withKeyPassword).toString('utf8');
   try {
     return await Promise.all(keys.map(async privateKey => {
+      if (psksOnly && !(privateKey instanceof openpgp.PersistentSymmetricKey)) {
+        return privateKey;
+      }
       if (privateKey.isDecrypted()) {
         return privateKey;
       }

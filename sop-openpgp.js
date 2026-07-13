@@ -114,7 +114,13 @@ globalThis.argv = yargs
   .command({
     command: 'verify <signature> <certfiles..>',
     describe: 'Verify Detached Signatures',
-    handler: async (argv) => { verify(argv.signature, argv.certfiles); }
+    builder: {
+      'with-key-password': {
+        describe: 'unlock persistent symmetric keys with the given password file',
+        type: 'string'
+      }
+    },
+    handler: async (argv) => { verify(argv.signature, argv.certfiles, argv.withKeyPassword); }
   })
   .command({
     command: 'inline-sign <keyfiles..>',
@@ -141,11 +147,15 @@ globalThis.argv = yargs
     command: 'inline-verify <certfiles..>',
     describe: 'Verify an Inline-Signed Message',
     builder: {
+      'with-key-password': {
+        describe: 'unlock persistent symmetric keys with the given password file',
+        type: 'string'
+      },
       'verifications-out': {
         describe: 'save verifications to file',
       }
     },
-    handler: async (argv) => { inlineVerify(argv.certfiles, argv.verificationsOut); }
+    handler: async (argv) => { inlineVerify(argv.certfiles, argv.withKeyPassword, argv.verificationsOut); }
   })
   .command({
     command: 'inline-detach',

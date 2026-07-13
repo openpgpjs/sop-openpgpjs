@@ -3,8 +3,12 @@ const process = require('process');
 const utils = require('../utils');
 const { NO_SIGNATURE, BAD_DATA } = require('../errorCodes');
 
-const verify = async (signature, certfiles) => {
-  const certs = await utils.loadCerts(...certfiles);
+const verify = async (signature, certfiles, withKeyPassword) => {
+  let verificationKeys = await utils.loadCerts(...certfiles);
+  if (withKeyPassword) {
+    verificationKeys = await utils.decryptKeys(verificationKeys, withKeyPassword, true);
+  }
+
   const sigBuf = utils.readFile(signature);
   let sig;
   try {
@@ -22,12 +26,12 @@ const verify = async (signature, certfiles) => {
 
   const options = {
     message: await openpgp.createMessage({ binary: data }),
-    verificationKeys: certs,
+    verificationKeys,
     signature: sig,
   };
 
   openpgp.verify(options).then(async (sig) => {
-    const verifications = await utils.getVerifications(sig.signatures, certs);
+    const verifications = await utils.getVerifications(sig.signatures, verificationKeys);
     if (verifications === '') {
       return process.exit(NO_SIGNATURE);
     }

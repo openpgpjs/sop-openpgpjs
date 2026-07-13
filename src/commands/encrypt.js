@@ -24,10 +24,15 @@ const encrypt = async (withPassword, signWith, withKeyPassword, certfiles, as, a
     return;
   }
 
+  let encryptionKeys = await utils.loadCerts(...certfiles);
+  if (withKeyPassword) {
+    encryptionKeys = await utils.decryptKeys(encryptionKeys, withKeyPassword, true);
+  }
+
   const options = {
     ...profileOptions,
     message,
-    encryptionKeys: await utils.loadCerts(...certfiles),
+    encryptionKeys,
     format: armor ? 'armored' : 'binary'
   };
   if (signWith.length) {
