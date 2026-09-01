@@ -3,7 +3,7 @@ const process = require('process');
 const utils = require('../utils');
 const { CANNOT_DECRYPT, BAD_DATA } = require('../errorCodes');
 
-const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verificationsOut, keyfiles, withKeyPassword) => {
+const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, verifyWithKey, verificationsOut, keyfiles, withKeyPassword) => {
   const encrypted = await utils.readStdin();
   let message;
   try {
@@ -79,9 +79,19 @@ const decrypt = async (withPassword, sessionKeyOut, withSessionKey, verifyWith, 
     format: 'binary'
   };
 
-  let verificationKeys;
+  let verificationKeys = [];
+  if (verifyWithKey.length) {
+    verificationKeys = await utils.loadKeys(...verifyWithKey);
+    if (withKeyPassword) {
+      // TODO: Don't error on key decryption failure, just consider the
+      // relevant signatures as invalid.
+      verificationKeys = await utils.decryptKeys(verificationKeys, withKeyPassword);
+    }
+  }
   if (verifyWith.length) {
-    verificationKeys = await utils.loadCerts(...verifyWith);
+    verificationKeys = verificationKeys.concat(await utils.loadCerts(...verifyWith));
+  }
+  if (verificationKeys.length) {
     options.verificationKeys = verificationKeys;
   }
 

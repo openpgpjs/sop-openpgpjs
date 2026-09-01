@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const yargs = require('yargs');
+const utils = require('./src/utils');
 const encrypt = require('./src/commands/encrypt');
 const decrypt = require('./src/commands/decrypt');
 const sign = require('./src/commands/sign');
@@ -14,7 +15,6 @@ const armor = require('./src/commands/armor');
 const dearmor = require('./src/commands/dearmor');
 const listProfiles = require('./src/commands/listProfiles');
 const version = require('./src/commands/version');
-const { getProfileOptions } = require('./src/utils');
 
 globalThis.argv = yargs
   .command({
@@ -23,6 +23,10 @@ globalThis.argv = yargs
     builder: {
       profile: {
         describe: 'specify profile to use',
+        type: 'string'
+      },
+      'with-key': {
+        describe: 'encrypt with key',
         type: 'string'
       },
       'with-password': {
@@ -48,12 +52,11 @@ globalThis.argv = yargs
       }
     },
     handler: async (argv) => {
-      const signWith =
-        Array.isArray(argv.signWith) ? argv.signWith :
-          argv.signWith ? [argv.signWith] :
-            [];
-      const profileOptions = getProfileOptions('encrypt', argv.profile);
-      encrypt(argv.withPassword, signWith, argv.withKeyPassword, argv.certfiles, argv.as, argv.armor, profileOptions);
+      const signWith = utils.toArray(argv.signWith);
+      const withKey = utils.toArray(argv.withKey);
+      const certfiles = utils.toArray(argv.certfiles);
+      const profileOptions = utils.getProfileOptions('encrypt', argv.profile);
+      encrypt(withKey, argv.withPassword, signWith, argv.withKeyPassword, certfiles, argv.as, argv.armor, profileOptions);
     }
   })
   .command({
@@ -75,7 +78,12 @@ globalThis.argv = yargs
         type: 'string'
       },
       'verify-with': {
+        describe: 'verify with cert',
+        type: 'string'
+      },
+      'verify-with-key': {
         describe: 'verify with key',
+        type: 'string'
       },
       'verifications-out': {
         describe: 'save verifications to file',
@@ -83,11 +91,9 @@ globalThis.argv = yargs
       }
     },
     handler: async (argv) => {
-      const verifyWith =
-        Array.isArray(argv.verifyWith) ? argv.verifyWith :
-          argv.verifyWith ? [argv.verifyWith] :
-            [];
-      decrypt(argv.withPassword, argv.sessionKeyOut, argv.withSessionKey, verifyWith, argv.verificationsOut, argv.keyfiles, argv.withKeyPassword);
+      const verifyWith = utils.toArray(argv.verifyWith);
+      const verifyWithKey = utils.toArray(argv.verifyWithKey);
+      decrypt(argv.withPassword, argv.sessionKeyOut, argv.withSessionKey, verifyWith, verifyWithKey, argv.verificationsOut, argv.keyfiles, argv.withKeyPassword);
     }
   })
   .command({
@@ -112,15 +118,23 @@ globalThis.argv = yargs
     handler: async (argv) => { sign(argv.keyfiles, argv.withKeyPassword, argv.as, argv.armor); }
   })
   .command({
-    command: 'verify <signature> <certfiles..>',
+    command: 'verify <signature> [certfiles..]',
     describe: 'Verify Detached Signatures',
     builder: {
+      'with-key': {
+        describe: 'verify with key',
+        type: 'string'
+      },
       'with-key-password': {
-        describe: 'unlock persistent symmetric keys with the given password file',
+        describe: 'unlock keys with the given password file',
         type: 'string'
       }
     },
-    handler: async (argv) => { verify(argv.signature, argv.certfiles, argv.withKeyPassword); }
+    handler: async (argv) => {
+      const withKey = utils.toArray(argv.withKey);
+      const certfiles = utils.toArray(argv.certfiles);
+      verify(argv.signature, certfiles, withKey, argv.withKeyPassword);
+    }
   })
   .command({
     command: 'inline-sign <keyfiles..>',
@@ -144,18 +158,26 @@ globalThis.argv = yargs
     handler: async (argv) => { inlineSign(argv.keyfiles, argv.withKeyPassword, argv.as, argv.armor); }
   })
   .command({
-    command: 'inline-verify <certfiles..>',
+    command: 'inline-verify [certfiles..]',
     describe: 'Verify an Inline-Signed Message',
     builder: {
+      'with-key': {
+        describe: 'verify with key',
+        type: 'string'
+      },
       'with-key-password': {
-        describe: 'unlock persistent symmetric keys with the given password file',
+        describe: 'unlock keys with the given password file',
         type: 'string'
       },
       'verifications-out': {
         describe: 'save verifications to file',
       }
     },
-    handler: async (argv) => { inlineVerify(argv.certfiles, argv.withKeyPassword, argv.verificationsOut); }
+    handler: async (argv) => {
+      const withKey = utils.toArray(argv.withKey);
+      const certfiles = utils.toArray(argv.certfiles);
+      inlineVerify(certfiles, withKey, argv.withKeyPassword, argv.verificationsOut);
+    }
   })
   .command({
     command: 'inline-detach',
@@ -212,7 +234,7 @@ globalThis.argv = yargs
     handler: async (argv) => {
       const armor = argv.armor != false;
       const userids = argv.userids || [];
-      const profileOptions = getProfileOptions('generate-key', argv.profile);
+      const profileOptions = utils.getProfileOptions('generate-key', argv.profile);
       generate(argv.withKeyPassword, armor, userids, profileOptions);
     }
   })

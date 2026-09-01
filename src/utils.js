@@ -5,6 +5,8 @@ const streamConsumer = require('node:stream/consumers');
 const { BAD_DATA, UNSUPPORTED_PROFILE, KEY_IS_PROTECTED } = require('./errorCodes');
 const PROFILES = require('./profiles');
 
+const toArray = (arg) => Array.isArray(arg) ? arg : arg ? [arg] : [];
+
 const readStdin = () => streamConsumer.buffer(process.stdin);
 
 const readFile = (filename) => {
@@ -67,13 +69,10 @@ const loadKeys = async (...filenames) => {
   }))).flat();
 };
 
-const decryptKeys = async (keys, withKeyPassword, psksOnly = false) => {
+const decryptKeys = async (keys, withKeyPassword) => {
   const keyPassword = readFile(withKeyPassword).toString('utf8');
   try {
     return await Promise.all(keys.map(async privateKey => {
-      if (psksOnly && !(privateKey instanceof openpgp.PersistentSymmetricKey)) {
-        return privateKey;
-      }
       if (privateKey.isDecrypted()) {
         return privateKey;
       }
@@ -148,6 +147,7 @@ const logError = function(e) {
 };
 
 module.exports = {
+  toArray,
   readStdin,
   readFile,
   writeFile,

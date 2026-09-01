@@ -3,7 +3,7 @@ const process = require('process');
 const utils = require('../utils');
 const { CERT_CANNOT_ENCRYPT } = require('../errorCodes');
 
-const encrypt = async (withPassword, signWith, withKeyPassword, certfiles, as, armor, profileOptions) => {
+const encrypt = async (withKey, withPassword, signWith, withKeyPassword, certfiles, as, armor, profileOptions) => {
   const data = await utils.readStdin();
   const message = await openpgp.createMessage(
     as === 'binary' ?
@@ -24,10 +24,11 @@ const encrypt = async (withPassword, signWith, withKeyPassword, certfiles, as, a
     return;
   }
 
-  let encryptionKeys = await utils.loadCerts(...certfiles);
+  let encryptionKeys = await utils.loadKeys(...withKey);
   if (withKeyPassword) {
-    encryptionKeys = await utils.decryptKeys(encryptionKeys, withKeyPassword, true);
+    encryptionKeys = await utils.decryptKeys(encryptionKeys, withKeyPassword);
   }
+  encryptionKeys = encryptionKeys.concat(await utils.loadCerts(...certfiles));
 
   const options = {
     ...profileOptions,

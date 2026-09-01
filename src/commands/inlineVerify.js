@@ -3,11 +3,14 @@ const process = require('process');
 const utils = require('../utils');
 const { NO_SIGNATURE, BAD_DATA } = require('../errorCodes');
 
-const inlineVerify = async (certfiles, withKeyPassword, verificationsOut) => {
-  let verificationKeys = await utils.loadCerts(...certfiles);
+const inlineVerify = async (certfiles, withKey, withKeyPassword, verificationsOut) => {
+  let verificationKeys = await utils.loadKeys(...withKey);
   if (withKeyPassword) {
-    verificationKeys = await utils.decryptKeys(verificationKeys, withKeyPassword, true);
+    // TODO: Only error on key decryption failure if we can't verify
+    // the message with another cert or unlocked key.
+    verificationKeys = await utils.decryptKeys(verificationKeys, withKeyPassword);
   }
+  verificationKeys = verificationKeys.concat(await utils.loadCerts(...certfiles));
 
   const data = await utils.readStdin();
   let message;
