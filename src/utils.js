@@ -26,6 +26,27 @@ const writeFile = (filename, contents) => {
   return fs.writeFileSync(filename, contents);
 }
 
+const loadCert = async (...filenames) => {
+  return await Promise.all(filenames.map(async filename => {
+    const buf = readFile(filename);
+
+    let cert;
+    try {
+      cert = await openpgp.readKey({ binaryKey: buf });
+    } catch (e) {
+      try {
+        cert = await openpgp.readKey({ armoredKey: buf.toString('utf8') });
+      } catch (e) {
+        logError(e);
+        return process.exit(BAD_DATA);
+      }
+    }
+    cert.filename = filename;
+
+    return cert;
+  }));
+};
+
 const loadCerts = async (...filenames) => {
   return (await Promise.all(filenames.map(async filename => {
     const buf = readFile(filename);
@@ -47,6 +68,26 @@ const loadCerts = async (...filenames) => {
 
     return certs;
   }))).flat();
+};
+
+const loadKey = async (...filenames) => {
+  return await Promise.all(filenames.map(async filename => {
+    const buf = readFile(filename);
+
+    let key;
+    try {
+      key = await openpgp.readPrivateKey({ binaryKey: buf });
+    } catch (e) {
+      try {
+        key = await openpgp.readPrivateKey({ armoredKey: buf.toString('utf8') });
+      } catch (e) {
+        logError(e);
+        return process.exit(BAD_DATA);
+      }
+    }
+
+    return key;
+  }));
 };
 
 const loadKeys = async (...filenames) => {
@@ -151,7 +192,9 @@ module.exports = {
   readStdin,
   readFile,
   writeFile,
+  loadCert,
   loadCerts,
+  loadKey,
   loadKeys,
   decryptKeys,
   formatDate,

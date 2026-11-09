@@ -24,11 +24,11 @@ const encrypt = async (withKey, withPassword, signWith, withKeyPassword, certfil
     return;
   }
 
-  let encryptionKeys = await utils.loadKeys(...withKey);
+  let encryptionKeys = await utils.loadKey(...withKey);
   if (withKeyPassword) {
     encryptionKeys = await utils.decryptKeys(encryptionKeys, withKeyPassword);
   }
-  encryptionKeys = encryptionKeys.concat(await utils.loadCerts(...certfiles));
+  encryptionKeys = encryptionKeys.concat(await utils.loadCert(...certfiles));
 
   const options = {
     ...profileOptions,
