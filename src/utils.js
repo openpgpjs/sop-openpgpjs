@@ -85,6 +85,7 @@ const loadKey = async (...filenames) => {
         return process.exit(BAD_DATA);
       }
     }
+    key.filename = filename;
 
     return key;
   }));
@@ -105,6 +106,9 @@ const loadKeys = async (...filenames) => {
         return process.exit(BAD_DATA);
       }
     }
+    keys.forEach(key => {
+      key.filename = filename;
+    });
 
     return keys;
   }))).flat();
